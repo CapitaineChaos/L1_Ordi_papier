@@ -1,0 +1,61 @@
+#   L'exercice 13.9 existe toujours dans le nouveau cours et porte le numéro 10.7. Son énoncé est le suivant:
+#
+#   Indiquer les mnémoniques qui correspondent aux valeurs suivantes dans la mémoire. Commenter le programme. Que fait-il ?
+#
+
+;     Informations de chargement (en hexa) :
+#############################################
+50 ; Adresse de début du programme
+3E ; Taille du programme
+#############################################
+
+; opcode | opérande | addr |  mnémonique + mode  |  sémantique               |  traduction
+
+; debut :
+    49       70    ;  0x50    IN     @           (@) ← Entrée                   w = input()
+    40       70    ;  0x52    LOAD   @           A ← (@)                        A = w
+    48       71    ;  0x54    STORE  @           (@) ← A                        x = A
+    48       72    ;  0x56    STORE  @           (@) ← A                        y = A
+    00       5E    ;  0x58    LOAD   #           A ← V                          Préparer saut_1
+    48       8D    ;  0x5A    STORE  @           (@) ← A                        Préparer saut_1
+    10       74    ;  0x5C    JUMP   @           PC ← @                         saut_2()
+
+; saut_1 :
+    40       71    ;  0x5E    LOAD   @           A ← (@)                        A = x
+    48       72    ;  0x60    STORE  @           (@) ← A                        y = A
+    40       70    ;  0x62    LOAD   @           A ← (@)                        A = w
+    48       71    ;  0x64    STORE  @           (@) ← A                        x = A
+    00       6C    ;  0x66    LOAD   #           A ← V                          préparer saut_out
+    48       8D    ;  0x68    STORE  @           (@) ← A                        préparer saut_out
+    10       74    ;  0x6A    JUMP   @           PC ← @                         saut_2()
+
+; saut_out :
+    41       71    ;  0x6C    OUT    @           Sortie ← (@)                   print(x)
+
+; saut_fin :
+    10       6E    ;  0x6E    JUMP   @           PC ← @                         saut_fin()
+
+    00             ;  0x70                       zone mémoire 70 (w)           
+    00             ;  0x71                       zone mémoire 71 (x)           
+    00             ;  0x72                       zone mémoire 72 (y)           
+    00             ;  0x73                       zone mémoire 73 (z)           
+
+; saut_2 :
+    00       00    ;  0x74    LOAD   #           A ← V                          A = 0
+    48       73    ;  0x76    STORE  @           (@) ← A                        z = A
+
+; saut_3 :
+    40       71    ;  0x78    LOAD   @           A ← (@)                        A = x
+    12       88    ;  0x7A    BRZ    @           si A = 0 alors PC ← @          if (A == 0) saut_4()
+    21       01    ;  0x7C    SUB    #           A ← A−V                        A = A - 1
+    48       71    ;  0x7E    STORE  @           (@) ← A                        x = A
+    40       73    ;  0x80    LOAD   @           A ← (@)                        A = z
+    60       72    ;  0x82    ADD    @           A ← A + (@)                    A = A + y
+    48       73    ;  0x84    STORE  @           (@) ← A                        z = A
+    10       78    ;  0x86    JUMP   @           PC ← @                         saut_3()
+
+; saut_4 :
+    40       73    ;  0x88    LOAD   @           A ← (@)                        A = z
+    48       71    ;  0x8A    STORE  @           (@) ← A                        x = A
+    10       00    ;  0x8C    JUMP   @           PC ← @                         saut_1() puis saut_out()
+

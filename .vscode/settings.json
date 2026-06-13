@@ -1,0 +1,21 @@
+{
+    "clangd.enable": false,
+    "clangd.detectExtensionConflicts": false,
+    "C_Cpp.intelliSenseEngine": "default",
+    "C_Cpp.default.compilerPath": "/usr/bin/gcc",
+    "C_Cpp.default.cStandard": "gnu99",
+    "C_Cpp.default.includePath": [
+        "${workspaceFolder}/include"
+    ],
+    "C_Cpp.default.defines": [],
+    "C_Cpp.doxygen.generateOnType": true,
+    "C_Cpp.doxygen.generateOnCodeAction": true,
+    "C_Cpp.doxygen.generatedStyle": "/**",
+    "files.associations": {
+        "*.h": "c"
+    },
+    "[c]": {
+        "editor.defaultFormatter": "ms-vscode.cpptools"
+    },
+    "editor.tabSize": 4
+}

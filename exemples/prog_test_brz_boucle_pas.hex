@@ -1,0 +1,22 @@
+; Programme de test cx25.0
+; Charge 5 dans l'accumulateur et l'affiche
+
+; Teste si le brz fonctionne 
+; Le programme ne doit pas boucler
+
+
+80    ; Adresse de début du programme
+0B     ; Taille du programme (11 octets)
+
+; Instructions du programme :
+00    ; LOAD #5
+05    ; valeur immédiate 5
+48    ; STORE @ 32
+32    ; adresse 32
+41    ; OUT @ 32
+32    ; adresse 32
+21    ; SUB #
+04    ; Valeur 05
+12    ; BRZ @
+80    ; à 0x80
+FF    ; STOP

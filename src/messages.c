@@ -1,0 +1,83 @@
+/*==============/                    cx25.1                    \================
+=~~~~~~~~~~~~~=|              Ordinateur en papier              |=~~~~~~~~~~~~~=
+================\              Messages du programme           /================
+
+Auteur : Sylvain Maitre     24002886
+
+Date de création :              07/06/2026
+Date de dernière modification : 13/06/2026
+
+Fichier     : messages.c
+Description : Affichage des messages utilisés dans le programme
+
+==============================================================================*/
+
+#include "messages.h"
+#include "pico.h" // IWYU pragma: keep
+#include <signal.h>
+#include <stdio.h>
+
+#define MSG_BUFFER_SIZE 4096
+
+void	msg_print_signal(int sig) {
+	switch (sig) {
+		case SIGINT:
+			printf(MSG_SIG_INT);
+			break;
+		case SIGTERM:
+			printf(MSG_SIG_TERM);
+			break;
+		case SIGQUIT:
+			printf(MSG_SIG_QUIT);
+			break;
+		case SIGHUP:
+			printf(MSG_SIG_HUP);
+			break;
+		case SIGTSTP:
+			printf(MSG_SIG_STP);
+			break;
+		default:
+			printf(MSG_SIG_AUTRE);
+			break;
+	}
+}
+
+void	msg_print_usage(const char *nom) {
+	printf(MSG_USAGE, nom, nom, nom);
+}
+
+void	msg_print_error(Mini_ordi *pico, int code) {
+	if (!code)
+		return;
+	if (code == 3)
+		fprintf(stderr, MSG_ERR_MEMORY, pico->RS);
+	else if (code == 4)
+		fprintf(stderr, MSG_ERR_INSTRUCTION, pico->OP);
+	else if (code == 5)
+		fprintf(stderr, MSG_ERR_CORE);
+	else
+		fprintf(stderr, MSG_ERR_INCONNUE, code);
+}
+
+void	msg_print_debug_help(void) {
+	printf(D_HOME E_SCREEN_ALL);
+	printf(MSG_CMDS);
+}
+
+void	msg_print_input_prompt(Modes *modes) {
+	if (!modes->verbeux)
+		return;
+	if (modes->bootstrap)
+		printf(MSG_INPUT_BOOTSTRAP);
+	else
+		printf(MSG_INPUT_PROGRAM);
+	printf(RST " $ ");
+}
+
+void	msg_perror_tty(void) {
+	fprintf(stderr, MSG_ERR_TTY);
+}
+
+void	msg_print_hex(int val) {
+	printf("%02X\n", val);
+}

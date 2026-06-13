@@ -1,0 +1,16 @@
+; Programme de test qui demande une entrée utilisateur
+; et l'affiche
+
+80    ; Adresse de début du programme
+09     ; Taille du programme (9 octets)
+
+; Instructions du programme :
+49     ; IN @ 32 - Lire une entrée et la stocker à l'adresse 32
+32     ; adresse 32
+41     ; OUT @ 32 - Afficher le contenu de l'adresse 32
+32     ; adresse 32
+49     ; IN @ 33 - Lire une autre entrée et la stocker à l'adresse 33
+33     ; adresse 33
+41     ; OUT @ 33 - Afficher le contenu de l'adresse 33
+33     ; adresse 33
+FF     ; STOP / ERREUR

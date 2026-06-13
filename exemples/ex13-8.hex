@@ -1,0 +1,33 @@
+#	Par contre, l'exercice 13.8 n'existe plus dans le nouveau cours. Son énoncé est le suivant:
+#
+#	Exercice 13.8 : (Assez difficile) Dans la mémoire, on trouve de l’adresse 30 à 45 les valeurs suivantes : 10 3a 00 31 40 32 60 33 48 32 49 33 40 33 22 ff 12 34 41 32 10 44. Dans PC se trouve 30. Que fera ce programme quand l’ordinateur en papier va tourner et l’exécuter ?
+#
+
+;     Informations de chargement (en hexa) :
+#############################################
+30 ; Adresse de début du programme
+16 ; Taille du programme
+#############################################
+
+; opcode | opérande | addr | mnémonique + mode |  sémantique              |     traduction
+
+; debut:
+    10        3a   ;  0x30     JUMP   @          PC ← @                         saut_1()
+
+    00             ;  0x32                       zone mémoire 32 (x)
+    31             ;  0x33                       zone mémoire 33 (y)
+
+; saut_2:
+    40        32   ;  0x34     LOAD   @          A ← (@)                        A = x
+    60        33   ;  0x36     ADD    @          A ← A + (@)                    A = A + y
+    48        32   ;  0x38     STORE  @          (@) ← A                        x = A
+
+; saut_1:
+    49        33   ;  0x3A     IN     @          (@) ← Entrée                   y = input()
+    40        33   ;  0x3C     LOAD   @          A ← (@)                        A = y
+    22        ff   ;  0x3E     NAND   #          A ← ¬[A&V]                     A = ~(A & 0xFF)
+    12        34   ;  0x40     BRZ    @          si A = 0 alors PC ← @          if (A == 0) saut_2()
+    41        32   ;  0x42     OUT    @          Sortie ← (@)                   print(x)
+
+; saut_3
+    10        44   ;  0x44     JUMP   @          PC ← @                         saut_3()

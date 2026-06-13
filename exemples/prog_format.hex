@@ -1,0 +1,13 @@
+; Programme de test cx25.0
+; Charge 5 dans l'accumulateur et l'affiche
+
+80 07   ; 
+
+; Instructions du programme :
+0005
+
+48    ; STORE @ 32
+32    ; adresse 32
+41    ; OUT @ 32
+32    ; adresse 32  
+   FF
