@@ -22,13 +22,17 @@ Description : Fonctions d'entrées/sorties du mini-ordinateur
  * @brief Affiche un octet en sortie
  * @param pico Le mini-ordinateur
  * @param val L'octet à afficher
+ * @todo Ajouter un avertissement de dépassement du buffer de sortie dans chaque mode
  */
 void	afficher_sortie(Mini_ordi *pico, u8 val) {
 	// Ajouter l'octet au buffer de sortie si possible
+	// Pas d'avertissement si c'est full, on laisse tomber
 	if (pico->IO.output_len < PICO_INPUT_BUFFER_SIZE)
 		pico->IO.output[pico->IO.output_len++] = (char)val;
+	if (pico->modes.debogage)
+		return;
 	// Préciser l'affichage pour le mode verbeux si activé
-	if (pico->modes.verbeux && !pico->modes.debogage)
+	if (pico->modes.verbeux)
 		printf("\nSortie : ");
 	msg_print_hex(val);
 }
