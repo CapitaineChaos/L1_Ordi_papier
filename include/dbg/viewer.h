@@ -16,9 +16,10 @@ Description : Déclarations du viewer du débogueur
 # define DBG_VIEWER_H
 
 # include "dbg.h"
+# include <stdbool.h>
 
-void	viewer_complet(Mini_ordi *pico, Dbg *dbg, int phase, t_mcseq *mseq, int pos);
-void	viewer_stdin(Mini_ordi *pico, Dbg *dbg);
-void	viewer_output(Mini_ordi *pico, Dbg *dbg);
+bool	compositeur_ecran(Mini_ordi *pico, Dbg *dbg, int phase, t_mcseq *mseq, int pos);
+bool	compositeur_stdin(Mini_ordi *pico, Dbg *dbg);
+bool	compositeur_output(Mini_ordi *pico, Dbg *dbg);
 
 #endif

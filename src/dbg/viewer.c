@@ -5,9 +5,9 @@
 Auteur : Sylvain Maitre     24002886
 
 Date de création :              11/06/2026
-Date de dernière modification : 12/06/2026
+Date de dernière modification : 20/06/2026
 
-Version du viewer : 4.0
+Version du viewer : 4.5
 
 Fichier     : dbg/viewer.c
 Description : Construction de l'écran du débogueur
@@ -15,8 +15,8 @@ Description : Construction de l'écran du débogueur
 ==============================================================================*/
 
 #include "dbg/viewer.h"
+#include "dbg/compositeur.h"
 #include "dbg/decode.h"
-#include "dbg/display.h"
 #include "dbg/render.h"
 #include "messages.h"
 
@@ -34,7 +34,7 @@ Description : Construction de l'écran du débogueur
  * @brief Affiche le titre de l'écran du débogueur
  * @param dbg Le débogueur
  */
-static void	composer_titre(Dbg *dbg) {
+static void	compositeur_titre(Dbg *dbg) {
 	render_set_line(dbg, 2, DBG_FOND_WH);
 	render_lg_col(dbg, 2, ADDR_COL, DBG_ENTETE_ADR);
 	render_lg_col(dbg, 2, MEM_COL + 1, DBG_ENTETE_MEM);
@@ -50,7 +50,7 @@ static void	composer_titre(Dbg *dbg) {
  * @note Affiche les registres PC, RS, RM, AD, OP, A, Z, N, UAL, IN et OUT
  * @note Met en évidence les registres modifiés ou lus
  */
-static void	composer_registre(Mini_ordi *pico, Dbg *dbg, int lg) {
+static void	compositeur_registre(Mini_ordi *pico, Dbg *dbg, int lg) {
 	int	microcode;
 	int	ecran_lg;
 	int	i = 0;
@@ -124,7 +124,7 @@ static void	afficher_ligne_memoire(Mini_ordi *pico, Dbg *dbg, int lg) {
  * @param pico Le mini-ordinateur
  * @param dbg Le débogueur
  */
-static void	composer_memoire(Mini_ordi *pico, Dbg *dbg) {
+static void	compositeur_memoire(Mini_ordi *pico, Dbg *dbg) {
 	int	ligne;
 
 	ligne = 0;
@@ -141,7 +141,7 @@ static void	composer_memoire(Mini_ordi *pico, Dbg *dbg) {
  * @param phase La phase en cours
  * @note Affiche la phase en cours sur la ligne 19
  */
-static void composer_phase(Dbg *dbg, int phase) {
+static void compositeur_phase(Dbg *dbg, int phase) {
 	render_set_line(dbg, 19, BGG_06 DBG_EMPTY_LINE);
 	render_lg_col(dbg, 19, 36, DBG_PHASE(phase));
 }
@@ -155,7 +155,7 @@ static void composer_phase(Dbg *dbg, int phase) {
  * @note Ligne 20 : microcode précédent et suivants
  * @note Ligne 21 : microcode à venir et sa sémantique
  */
-static void	composer_microcodes(Dbg *dbg, t_mcseq *mseq, int pos) {
+static void	compositeur_microcodes(Dbg *dbg, t_mcseq *mseq, int pos) {
 	int	i = 0;
 	int	microcode = 0;
 	int microcode_p = dbg->exec.microcode_precedent;
@@ -190,7 +190,7 @@ static void	composer_microcodes(Dbg *dbg, t_mcseq *mseq, int pos) {
  * @param pos La position du microcode en cours dans la microsequence
  * @note Affiche l'instruction à venir
  */
-static void	composer_instruction(Mini_ordi *pico, Dbg *dbg, int phase, int pos) {
+static void	compositeur_instruction(Mini_ordi *pico, Dbg *dbg, int phase, int pos) {
 	// L'instruction n'est connue qu'à partir du microcode n°5 de la phase 1
 	// Soit en position 3
 	if (phase == 1 && pos == 3)
@@ -206,7 +206,7 @@ static void	composer_instruction(Mini_ordi *pico, Dbg *dbg, int phase, int pos) 
  * @note Affiche le mode d'exécution actuel du débogueur sur la ligne 23
  * @note par défaut le mode d'exécution est le mode microcode
  */
-static void	composer_mode(Dbg *dbg) {
+static void	compositeur_mode(Dbg *dbg) {
 	if (dbg->texte.lg_mode[0] == '\0')
 		render_set_text(dbg->texte.lg_mode, sizeof(dbg->texte.lg_mode), DBG_MODE_MICROCODE);
 	render_set_line(dbg, 23, BGG_06 DBG_EMPTY_LINE);
@@ -215,35 +215,27 @@ static void	composer_mode(Dbg *dbg) {
 
 
 /**
- * @brief Affiche l'écran du débogueur
+ * @brief Compose l'écran principal du débogueur dans le buffer
  * @param pico Le mini-ordinateur
  * @param dbg Le débogueur
  * @param phase La phase en cours
  * @param mseq La microsequence de la phase en cours
  * @param pos La position du microcode en cours dans la microsequence
- * @note Affiche l'écran du débogueur avec la mémoire, les registres, 
- * la phase en cours, les microcodes de la phase en cours, 
- * l'instruction à venir et le mode d'exécution actuel du débogueur
+ * @return true si l'écran a été composé, false si le terminal n'est pas affichable
+ * @note Compose la mémoire, les registres, la phase en cours, les microcodes,
+ * l'instruction à venir et le mode d'exécution. Ne dessine pas : l'affichage
+ * est déclenché par l'appelant via dbg_display_draw().
  */
-void	viewer_complet(Mini_ordi *pico, Dbg *dbg, int phase, t_mcseq *mseq, int pos) {
-	if (!dbg_get_tty(dbg))
-		return;
-	if (!dbg_display_terminal_ok(dbg)) {
-		dbg_display_trop_petit(dbg);
-		return;
-	}
-	dbg->terminal.petit_affiche = false;
-	dbg_render_clear(dbg);
-	render_top_menu(pico, dbg);
-	composer_titre(dbg);
-	composer_memoire(pico, dbg);
-	composer_registre(pico, dbg, 0);
-	composer_phase(dbg, phase);
-	composer_mode(dbg);
-	composer_microcodes(dbg, mseq, pos);
-	composer_instruction(pico, dbg, phase, pos);
-	// Effectuer l'affichage final
-	dbg_display_draw(dbg);
-	// L'affichage de l'interaction est délégué à la fonction de gestion des commandes
-	// En commençant par attente_commande()
+bool	compositeur_ecran(Mini_ordi *pico, Dbg *dbg, int phase, t_mcseq *mseq, int pos) {
+	if (!compositeur_debut(dbg))
+		return (false);
+	compositeur_top_menu(pico, dbg);
+	compositeur_titre(dbg);
+	compositeur_memoire(pico, dbg);
+	compositeur_registre(pico, dbg, 0);
+	compositeur_phase(dbg, phase);
+	compositeur_mode(dbg);
+	compositeur_microcodes(dbg, mseq, pos);
+	compositeur_instruction(pico, dbg, phase, pos);
+	return (true);
 }

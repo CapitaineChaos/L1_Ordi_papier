@@ -5,7 +5,7 @@
 Auteur : Sylvain Maitre     24002886
 
 Date de création :              11/06/2026
-Date de dernière modification : 13/06/2026
+Date de dernière modification : 20/06/2026
 
 Fichier     : dbg/display.c
 Description : Display différentiel 80x27 du débogueur
@@ -143,26 +143,6 @@ static void	draw_line(Dbg *dbg, FILE *tty, int line, const char *content) {
 }
 
 /**
- * @brief Affiche une ligne spécifique de l'écran du débogueur
- * @param dbg Le débogueur
- * @param line La ligne à afficher
- */
-void	dbg_display_draw_line(Dbg *dbg, int line) {
-	FILE	*tty;
-
-	if (line < 0 || line >= DBG_SCREEN_LINES)
-		return;
-	tty = dbg_get_tty(dbg);
-	if (!tty)
-		return;
-	dbg_display_enter(dbg);
-	init_screen(dbg);
-	draw_line(dbg, tty, line, dbg->screen.courant[line]);
-	fflush(tty);
-}
-
-
-/**
  * @brief Affiche l'ensemble de l'écran du débogueur
  * @param dbg Le débogueur
  * @note Affiche l'ensemble de l'écran du débogueur en ne redessinant
@@ -183,27 +163,6 @@ void	dbg_display_draw(Dbg *dbg) {
 }
 
 /**
- * @brief Affiche l'interaction du débogueur
- * @param dbg Le débogueur
- * @note Ligne de status : affichage divers
- * @note Ligne de prompt : commanndes ou demande de saisies
- * @note Ligne de saisie de commande : interaction utilisateur
- */
-void	dbg_display_interaction(Dbg *dbg) {
-	FILE	*tty;
-
-	tty = dbg_get_tty(dbg);
-	if (!tty)
-		return;
-	dbg_display_enter(dbg);
-	init_screen(dbg);
-	draw_line(dbg, tty, DBG_COMMAND_LINE, dbg->screen.courant[DBG_COMMAND_LINE]);
-	draw_line(dbg, tty, DBG_PROMPT_LINE, dbg->screen.courant[DBG_PROMPT_LINE]);
-	draw_line(dbg, tty, DBG_STATE_LINE, dbg->screen.courant[DBG_STATE_LINE]);
-	fflush(tty);
-}
-
-/**
  * @brief Affiche un message indiquant que le terminal est trop petit
  * @param dbg Le débogueur
  */
@@ -213,10 +172,13 @@ void	dbg_display_trop_petit(Dbg *dbg) {
 	tty = dbg_get_tty(dbg);
 	if (!tty)
 		return;
+	// Affiché une seule fois : pas de réimpression à chaque resize (sinon vibration)
 	if (dbg->terminal.petit_affiche)
 		return;
 	dbg_display_leave(dbg);
-	fprintf(tty, RST D_WRAP D_SHOW_CURSOR D_HOME E_SCREEN_ALL "%s\n", DBG_STATE_SMALL_TERM);
+	// D_NO_WRAP : la ligne ne se replie pas selon la largeur, le message ne se
+	// déplace donc plus quand on redimensionne le terminal
+	fprintf(tty, RST D_NO_WRAP D_SHOW_CURSOR D_HOME E_SCREEN_ALL "%s", DBG_STATE_SMALL_TERM);
 	dbg->terminal.petit_affiche = true;
 	fflush(tty);
 	dbg->screen.initialise = false;

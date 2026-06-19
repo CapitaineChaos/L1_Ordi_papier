@@ -5,7 +5,7 @@
 Auteur : Sylvain Maitre     24002886
 
 Date de création :              01/10/2025
-Date de dernière modification : 13/06/2026
+Date de dernière modification : 20/06/2026
 
 Version du débogueur : 3.1
 
@@ -80,8 +80,10 @@ void	exec_debogueur(Mini_ordi *pico, Dbg *dbg, int phase, t_mcseq *mseq, int pos
 	}
 
 	// Eviter le rafraichissement lié aux mouvements des sélections
-	if (!dbg->exec.next_instruction && !dbg->exec.next_phase)
-		viewer_complet(pico, dbg, phase, mseq, pos);
+	if (!dbg->exec.next_instruction && !dbg->exec.next_phase) {
+		if (compositeur_ecran(pico, dbg, phase, mseq, pos))
+			dbg_display_draw(dbg);
+	}
 
 	while (cmd == DBG_CMD_NONE || cmd == DBG_CMD_UNKNOWN || cmd == DBG_CMD_HELP || cmd == DBG_CMD_REFRESH)
 	{
@@ -104,7 +106,8 @@ void	exec_debogueur(Mini_ordi *pico, Dbg *dbg, int phase, t_mcseq *mseq, int pos
 
 		/** En cas de redimensionnement */
 		if (cmd == DBG_CMD_REFRESH) {
-			viewer_complet(pico, dbg, phase, mseq, pos);
+			if (compositeur_ecran(pico, dbg, phase, mseq, pos))
+				dbg_display_draw(dbg);
 			cmd = DBG_CMD_NONE;
 			return;
 		}
@@ -131,6 +134,7 @@ void	exec_debogueur(Mini_ordi *pico, Dbg *dbg, int phase, t_mcseq *mseq, int pos
 			return;
 		}
 
-		viewer_complet(pico, dbg, phase, mseq, pos);
+		if (compositeur_ecran(pico, dbg, phase, mseq, pos))
+			dbg_display_draw(dbg);
 	}
 }

@@ -1,11 +1,11 @@
 /*==============/                    cx25.1                    \================
 =~~~~~~~~~~~~~=|              Ordinateur en papier              |=~~~~~~~~~~~~~=
-================\              Internes des entrées            /================
+================\             Internes des entrées             /================
 
 Auteur : Sylvain Maitre     24002886
 
 Date de création :              12/06/2026
-Date de dernière modification : 13/06/2026
+Date de dernière modification : 20/06/2026
 
 Fichier     : io/internal.h
 Description : Fonctions internes partagées des entrées/sorties

@@ -26,8 +26,6 @@ void	dbg_display_raw_enter(Dbg *dbg);
 void	dbg_display_raw_leave(Dbg *dbg);
 bool	dbg_display_terminal_ok(Dbg *dbg);
 void	dbg_display_draw(Dbg *dbg);
-void	dbg_display_interaction(Dbg *dbg);
-void	dbg_display_draw_line(Dbg *dbg, int line);
 void	dbg_display_trop_petit(Dbg *dbg);
 
 #endif

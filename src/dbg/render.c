@@ -1,11 +1,11 @@
 /*==============/                    cx25.1                    \================
 =~~~~~~~~~~~~~=|              Ordinateur en papier              |=~~~~~~~~~~~~~=
-================\              Rendu des buffers debug         /================
+================\           Rendu des buffers debug            /================
 
 Auteur : Sylvain Maitre     24002886
 
 Date de création :              11/06/2026
-Date de dernière modification : 13/06/2026
+Date de dernière modification : 20/06/2026
 
 Fichier     : dbg/render.c
 Description : Rendu des buffers du débogueur
@@ -65,18 +65,6 @@ void	render_set_line(Dbg *dbg, int line, const char *fmt, ...) {
 }
 
 /**
- * @brief Affiche le menu supérieur de l'écran du débogueur
- * @param pico Le mini-ordinateur
- * @param dbg Le débogueur
- */
-void	render_top_menu(Mini_ordi *pico, Dbg *dbg) {
-	render_set_line(dbg, 0, DBG_FOND_BK);
-	render_lg_col(dbg, 0, 4, DBG_TOP_MENU(IO_STDIN_AVAILABLE,
-			IO_OUTPUT_AVAILABLE));
-	render_set_line(dbg, 1, DBG_TOP_TITRE);
-}
-
-/**
  * @brief Remplit un intervalle de lignes de l'écran du débogueur avec une chaîne de formatage
  * @param dbg Le débogueur
  * @param from Le numéro de la ligne de départ
@@ -88,18 +76,6 @@ void	render_fill_lines(Dbg *dbg, int from, int to, const char *fmt) {
 		render_set_line(dbg, from, fmt);
 		from++;
 	}
-}
-
-/**
- * @brief Affiche le bas de l'écran du débogueur
- * @param dbg Le débogueur
- * @param line Le numéro de la ligne de départ pour le bas de l'écran
- */
-void	render_viewer_bottom(Dbg *dbg, int line) {
-	render_fill_lines(dbg, line, DBG_STATE_LINE, DBG_FOND_BK);
-	render_set_line(dbg, DBG_STATE_LINE, MSG_TOUCHE);
-	render_set_line(dbg, DBG_PROMPT_LINE, DBG_FOND_BK);
-	render_set_line(dbg, DBG_COMMAND_LINE, DBG_FOND_BK);
 }
 
 /**

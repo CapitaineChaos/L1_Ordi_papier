@@ -5,7 +5,7 @@
 Auteur : Sylvain Maitre     24002886
 
 Date de création :              12/06/2026
-Date de dernière modification : 12/06/2026
+Date de dernière modification : 20/06/2026
 
 Fichier     : dbg/io_view.c
 Description : Affichage des vues d'entrée et de sortie du débogueur
@@ -13,7 +13,7 @@ Description : Affichage des vues d'entrée et de sortie du débogueur
 ==============================================================================*/
 
 #include "dbg/viewer.h"
-#include "dbg/display.h"
+#include "dbg/compositeur.h"
 #include "dbg/render.h"
 #include "messages.h"
 #include <ctype.h>
@@ -69,23 +69,18 @@ static void	afficher_ligne_output(Dbg *dbg, Mini_ordi *pico, size_t pos, int lin
 }
 
 /**
- * @brief Affiche le contenu de l'entrée standard du mini-ordinateur
+ * @brief Compose le contenu de l'entrée standard du mini-ordinateur dans le buffer
  * @param pico Le mini-ordinateur
  * @param dbg Le débogueur
+ * @return true si l'écran a été composé, false si le terminal n'est pas affichable
  */
-void	viewer_stdin(Mini_ordi *pico, Dbg *dbg) {
+bool	compositeur_stdin(Mini_ordi *pico, Dbg *dbg) {
 	size_t	pos;
 	int		line;
 
-	if (!dbg_get_tty(dbg))
-		return;
-	if (!dbg_display_terminal_ok(dbg)) {
-		dbg_display_trop_petit(dbg);
-		return;
-	}
-	dbg->terminal.petit_affiche = false;
-	dbg_render_clear(dbg);
-	render_top_menu(pico, dbg);
+	if (!compositeur_debut(dbg))
+		return (false);
+	compositeur_top_menu(pico, dbg);
 	render_set_line(dbg, 2, DBG_FOND_WH);
 	render_lg_col(dbg, 2, 3,
 		MSG_STDIN_RESTANT(pico->IO.buffer_len, pico->IO.buffer_pos));
@@ -102,28 +97,23 @@ void	viewer_stdin(Mini_ordi *pico, Dbg *dbg) {
 		render_lg_col(dbg, DBG_STATE_LINE - 1, 3,
 			MSG_STDIN_IGNORE(pico->IO.buffer_len, pos));
 	}
-	render_viewer_bottom(dbg, line);
-	dbg_display_draw(dbg);
+	compositeur_bottom(dbg, line);
+	return (true);
 }
 
 /**
- * @brief Affiche le contenu de la sortie standard du mini-ordinateur
+ * @brief Compose le contenu de la sortie standard du mini-ordinateur dans le buffer
  * @param pico Le mini-ordinateur
  * @param dbg Le débogueur
+ * @return true si l'écran a été composé, false si le terminal n'est pas affichable
  */
-void	viewer_output(Mini_ordi *pico, Dbg *dbg) {
+bool	compositeur_output(Mini_ordi *pico, Dbg *dbg) {
 	size_t	pos;
 	int		line;
 
-	if (!dbg_get_tty(dbg))
-		return;
-	if (!dbg_display_terminal_ok(dbg)) {
-		dbg_display_trop_petit(dbg);
-		return;
-	}
-	dbg->terminal.petit_affiche = false;
-	dbg_render_clear(dbg);
-	render_top_menu(pico, dbg);
+	if (!compositeur_debut(dbg))
+		return (false);
+	compositeur_top_menu(pico, dbg);
 	render_set_line(dbg, 2, DBG_FOND_WH);
 	render_lg_col(dbg, 2, 3, MSG_OUTPUT_TOTAL(pico->IO.output_len));
 	render_lg_col(dbg, 2, 63, MSG_STDIN_ASC);
@@ -139,6 +129,6 @@ void	viewer_output(Mini_ordi *pico, Dbg *dbg) {
 		render_lg_col(dbg, DBG_STATE_LINE - 1, 3,
 			MSG_OUTPUT_IGNORE(pico->IO.output_len, pos));
 	}
-	render_viewer_bottom(dbg, line);
-	dbg_display_draw(dbg);
+	compositeur_bottom(dbg, line);
+	return (true);
 }

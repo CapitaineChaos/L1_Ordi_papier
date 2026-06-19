@@ -1,11 +1,11 @@
 /*==============/                    cx25.1                    \================
 =~~~~~~~~~~~~~=|              Ordinateur en papier              |=~~~~~~~~~~~~~=
-================\              Entrée debug                    /================
+================\                 Entrée debug                 /================
 
 Auteur : Sylvain Maitre     24002886
 
 Date de création :              12/06/2026
-Date de dernière modification : 13/06/2026
+Date de dernière modification : 20/06/2026
 
 Fichier     : io/debug.c
 Description : Saisie spéciale en mode débogueur
@@ -13,14 +13,13 @@ Description : Saisie spéciale en mode débogueur
 ==============================================================================*/
 
 #include "internal.h"
+#include "dbg/compositeur.h"
 #include "dbg/display.h"
+#include "dbg/input.h"
 #include "dbg/render.h"
-#include "dbg/resize.h"
 #include "messages.h"
 #include "pico.h"
 #include <ctype.h>
-#include <errno.h>
-#include <stdlib.h>
 
 /**
  * @brief Affiche l'invite de saisie en mode débogueur
@@ -28,28 +27,14 @@ Description : Saisie spéciale en mode débogueur
  * @param hex La chaîne hexadécimale à afficher
  */
 static void	afficher_invite_debug_entree(Mini_ordi *pico, const char *hex) {
-	Dbg	*dbg;
-	bool	redessiner;
+	Dbg	*dbg = pico->dbg;
 
-	dbg = pico->dbg;
-	if (!dbg_display_terminal_ok(dbg)) {
-		dbg_display_trop_petit(dbg);
+	if (!compositeur_overlay_ok(dbg))
 		return;
-	}
-	redessiner = dbg->terminal.petit_affiche;
-	dbg->terminal.petit_affiche = false;
-	render_set_line(dbg, DBG_PROMPT_LINE, LG_COLOR(FOND_FONCE, B_WH));
-	if (pico->PC < 32)
-		render_lg_col(dbg, DBG_PROMPT_LINE, 1, MODE_FONCE BLD MSG_INPUT_BOOTSTRAP RST);
-	else
-		render_lg_col(dbg, DBG_PROMPT_LINE, 1, MODE_FONCE BLD MSG_INPUT_PROGRAM RST);
-	render_set_line(dbg, DBG_COMMAND_LINE, DBG_FOND_BK);
-	render_lg_col(dbg, DBG_COMMAND_LINE, 1, DBG_INVITE(false));
-	render_append_to_line(dbg, DBG_COMMAND_LINE, "%s", hex);
-	if (redessiner)
-		dbg_display_draw(dbg);
-	else
-		dbg_display_interaction(dbg);
+	compositeur_invite_entree(pico, dbg, hex);
+	// Le viewer différentiel gère aussi le retour depuis l'état « trop petit »
+	// (init_screen réinitialise le buffer précédent et force un redessin complet)
+	dbg_display_draw(dbg);
 }
 
 
@@ -60,85 +45,54 @@ static void	afficher_invite_debug_entree(Mini_ordi *pico, const char *hex) {
  * @return L'octet hexadécimal lu
  */
 static u8	lire_entree_debug_utilisateur(Mini_ordi *pico) {
+	Dbg		*dbg = pico->dbg;
 	FILE	*stream;
-	FILE	*tty;
 	char	hex[3];
 	size_t	len;
 	int		c;
-	int		echappement;
 	u8		val;
 
-	tty = dbg_get_tty(pico->dbg);
-	if (!tty)
-		return (DBG_CMD_STOP_DBG);
-
+	if (!dbg_get_tty(dbg))
+		return (0);
 	stream = io_flux_entree_utilisateur(pico);
 	hex[0] = '0';
 	hex[1] = '0';
 	hex[2] = '\0';
 	len = 0;
-	echappement = 0;
-	// Initialiser la gestion du redimensionnement du terminal
-	dbg_resize_init();
-	dbg_display_raw_enter(pico->dbg);
+	dbg_input_debut(dbg);
 	afficher_invite_debug_entree(pico, hex);
 	while (true) {
-		c = fgetc(stream);
-		if (c == EOF) {
-			if (ferror(stream) && errno == EINTR && dbg_resize_recu()) {
-				clearerr(stream);
-				dbg_resize_reset();
-				if (dbg_resize_recu()) {
-					afficher_invite_debug_entree(pico, hex);
-					dbg_display_raw_enter(pico->dbg);
-				}
-				continue;
-			}
-			continue;
-		}
-		// Ctrl-C ou Ctrl-D pour quitter
-		if (c == 3 || c == 4) {
-			dbg_display_raw_leave(pico->dbg);
-			dbg_display_leave(pico->dbg);
-			exit(0);
-		}
-		// Gérer les séquences d'échappement (flèches ...)
-		// pour ne pas les afficher dans la ligne de commande
-		if (c == 27) {
-			echappement = 1;
-			continue;
-		}
-		// Gestion des bizarreries comme la molette ou autres
-		// Si on est dans une séquence d'échappement, on ignore les caractères suivants jusqu'à la fin de la séquence
-		if (echappement == 1) {
-			echappement = (c == '[' || c == 'O') ? 2 : 0;
-			continue;
-		}
-		// Si on est dans une séquence d'échappement, on ignore les caractères suivants jusqu'à la fin
-		if (echappement == 2) {
-			if (c >= '@' && c <= '~')
-				echappement = 0;
-			continue;
-		}
-		// Backspace pour effacer le dernier caractère entré
-		if ((c == 127 || c == '\b') && len > 0) {
-			hex[1] = hex[0];
-			hex[0] = '0';
-			len--;
+		c = dbg_input_touche(dbg, stream);
+		if (c == DBG_KEY_EOF)
+			break;
+		if (c == DBG_KEY_RESIZE) {
 			afficher_invite_debug_entree(pico, hex);
 			continue;
 		}
-		// Entrée valide (hexadécimale) pour construire l'octet à saisir
-		if ((c == '\n' || c == '\r') && len > 0 && len < 3)
-			break;
-		if (isxdigit((unsigned char)c) && len < 2) {
+		// Backspace pour effacer le dernier chiffre entré
+		if (c == DBG_KEY_BACKSPACE) {
+			if (len > 0) {
+				hex[1] = hex[0];
+				hex[0] = '0';
+				len--;
+				afficher_invite_debug_entree(pico, hex);
+			}
+			continue;
+		}
+		// Entrée valide (au moins un chiffre saisi) pour construire l'octet
+		if (c == DBG_KEY_ENTER) {
+			if (len > 0)
+				break;
+			continue;
+		}
+		if (isxdigit(c) && len < 2) {
 			hex[0] = hex[1];
-			hex[1] = (char)toupper((unsigned char)c);
+			hex[1] = (char)toupper(c);
 			len++;
 			afficher_invite_debug_entree(pico, hex);
 		}
 	}
-	// dbg_display_raw_leave(pico->dbg);
+	dbg_input_fin(dbg);
 	io_parse_hex_byte(hex, &val);
 	return (val);
 }
@@ -168,7 +122,7 @@ static void	source_entree_status(Mini_ordi *pico, bool is_stdin) {
 	}
 	render_set_line(pico->dbg, DBG_STATE_LINE, DBG_STATE_FOND);
 	render_lg_col(pico->dbg, DBG_STATE_LINE, 1, pico->dbg->texte.lg_status);
-	dbg_display_interaction(pico->dbg);
+	dbg_display_draw(pico->dbg);
 }
 
 /**

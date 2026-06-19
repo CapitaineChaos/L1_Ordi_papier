@@ -5,7 +5,7 @@
 Auteur : Sylvain Maitre     24002886
 
 Date de création :              12/06/2026
-Date de dernière modification : 13/06/2026
+Date de dernière modification : 20/06/2026
 
 Fichier     : dbg/menu.c
 Description : Navigation dans les menus debug
@@ -13,13 +13,13 @@ Description : Navigation dans les menus debug
 ==============================================================================*/
 
 #include "dbg/menu.h"
+#include "dbg/compositeur.h"
 #include "dbg/display.h"
+#include "dbg/input.h"
 #include "dbg/keys.h"
 #include "dbg/render.h"
-#include "dbg/resize.h"
 #include "dbg/viewer.h"
 #include "messages.h"
-#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -39,22 +39,19 @@ static void	afficher_ligne_aide(Dbg *dbg, int line,
 }
 
 /**
- * @brief Affiche l'aide du débogueur
+ * @brief Compose l'aide du débogueur dans le buffer
  * @param pico Le mini-ordinateur
  * @param dbg Le débogueur
+ * @return true si l'écran a été composé, false si le terminal n'est pas affichable
  */
-static void	afficher_aide(Mini_ordi *pico, Dbg *dbg) {
+static bool	compositeur_aide(Mini_ordi *pico, Dbg *dbg) {
 	const char	*debut;
 	const char	*fin;
 	int			line;
 
-	if (!dbg_display_terminal_ok(dbg)) {
-		dbg_display_trop_petit(dbg);
-		return;
-	}
-	dbg->terminal.petit_affiche = false;
-	dbg_render_clear(dbg);
-	render_top_menu(pico, dbg);
+	if (!compositeur_debut(dbg))
+		return (false);
+	compositeur_top_menu(pico, dbg);
 	render_set_line(dbg, 2, DBG_FOND_WH);
 	debut = MSG_CMDS;
 	line = 3;
@@ -70,23 +67,28 @@ static void	afficher_aide(Mini_ordi *pico, Dbg *dbg) {
 		if (*debut == '\n')
 			debut++;
 	}
-	render_viewer_bottom(dbg, line);
-	dbg_display_draw(dbg);
+	compositeur_bottom(dbg, line);
+	return (true);
 }
 
 /**
- * @brief Affiche le menu du débogueur en fonction de la commande
+ * @brief Compose puis affiche le menu du débogueur en fonction de la commande
  * @param pico Le mini-ordinateur
  * @param dbg Le débogueur
  * @param menu Le menu actuel
+ * @note Orchestre la composition (compositeur_*) puis l'affichage différentiel unique.
  */
 static void	afficher_menu(Mini_ordi *pico, Dbg *dbg, dbg_cmd menu) {
+	bool	compose = false;
+
 	if (menu == DBG_CMD_SHOW_HELP)
-		afficher_aide(pico, dbg);
+		compose = compositeur_aide(pico, dbg);
 	else if (menu == DBG_CMD_SHOW_INPUT && IO_STDIN_AVAILABLE)
-		viewer_stdin(pico, dbg);
+		compose = compositeur_stdin(pico, dbg);
 	else if (menu == DBG_CMD_SHOW_OUTPUT && IO_OUTPUT_AVAILABLE)
-		viewer_output(pico, dbg);
+		compose = compositeur_output(pico, dbg);
+	if (compose)
+		dbg_display_draw(dbg);
 }
 
 /**
@@ -108,33 +110,16 @@ dbg_cmd	attendre_menu(Mini_ordi *pico, Dbg *dbg, dbg_cmd menu) {
 	if (!tty)
 		return (DBG_CMD_STOP_DBG);
 	afficher_menu(pico, dbg, menu);
-	dbg_display_raw_enter(dbg);
+	dbg_input_debut(dbg);
 	while (true) {
-		c = fgetc(tty);
-		if (c == EOF) {
-			// Si on reçoit un signal de redimensionnement du terminal, on redessine l'écran
-			if (ferror(tty) && errno == EINTR) {
-				clearerr(tty);
-				// Redessiner l'écran du débogueur
-				if (dbg_resize_recu()) {
-					dbg_resize_reset();
-					// Si le terminal est trop petit, afficher un message d'erreur
-					if (!dbg_display_terminal_ok(dbg))
-						dbg_display_trop_petit(dbg);
-					else
-						afficher_menu(pico, dbg, menu);
-					dbg_display_raw_enter(dbg);
-				}
-				continue;
-			}
-			dbg_display_raw_leave(dbg);
+		c = dbg_input_touche(dbg, tty);
+		if (c == DBG_KEY_EOF) {
+			dbg_input_fin(dbg);
 			return (DBG_CMD_STOP_DBG);
 		}
-		// Ctrl-C ou Ctrl-D pour quitter le débogueur
-		if (c == 3 || c == 4) {
-			dbg_display_raw_leave(dbg);
-			dbg_display_leave(dbg);
-			exit(0);
+		if (c == DBG_KEY_RESIZE) {
+			afficher_menu(pico, dbg, menu);
+			continue;
 		}
 		cmd = dbg_key_directe(pico, c);
 		if (cmd == DBG_CMD_QUIT || cmd == DBG_CMD_STOP_DBG)
@@ -142,10 +127,9 @@ dbg_cmd	attendre_menu(Mini_ordi *pico, Dbg *dbg, dbg_cmd menu) {
 		if (cmd == DBG_CMD_SHOW_HELP || cmd == DBG_CMD_SHOW_INPUT || cmd == DBG_CMD_SHOW_OUTPUT) {
 			menu = cmd;
 			afficher_menu(pico, dbg, menu);
-			dbg_display_raw_enter(dbg);
 			continue;
 		}
-		dbg_display_raw_leave(dbg);
+		dbg_input_fin(dbg);
 		return (DBG_CMD_HELP);
 	}
 }

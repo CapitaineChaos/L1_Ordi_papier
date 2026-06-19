@@ -1,11 +1,11 @@
 /*==============/                    cx25.1                    \================
 =~~~~~~~~~~~~~=|              Ordinateur en papier              |=~~~~~~~~~~~~~=
-================\               Entrées / Sorties              /================
+================\              Entrées / Sorties               /================
 
 Auteur : Sylvain Maitre     24002886
 
 Date de création :              01/10/2025
-Date de dernière modification : 13/06/2026
+Date de dernière modification : 20/06/2026
 
 Fichier     : io/io.c
 Description : Fonctions d'entrées/sorties du mini-ordinateur

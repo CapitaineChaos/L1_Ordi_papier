@@ -5,7 +5,8 @@
     "C_Cpp.default.compilerPath": "/usr/bin/gcc",
     "C_Cpp.default.cStandard": "gnu99",
     "C_Cpp.default.includePath": [
-        "${workspaceFolder}/include"
+        "${workspaceFolder}/include",
+        "${workspaceFolder}/include/**",
     ],
     "C_Cpp.default.defines": [],
     "C_Cpp.doxygen.generateOnType": true,
