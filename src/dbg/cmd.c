@@ -5,7 +5,7 @@
 Auteur : Sylvain Maitre     24002886
 
 Date de création :              11/06/2026
-Date de dernière modification : 13/06/2026
+Date de dernière modification : 19/06/2026
 
 Fichier     : dbg/cmd.c
 Description : Lecture et interprétation des commandes debug
@@ -63,17 +63,13 @@ static void	afficher_attente(Mini_ordi *pico, Dbg *dbg, bool err, const char *st
 
 	if (dbg->erreur_prog) {
 		if (dbg->erreur_prog == 3)
-			render_set_text(dbg->texte.lg_status, sizeof(dbg->texte.lg_status),
-				MSG_ERR_MEMORY, pico->RS);
+			render_set_text(dbg->texte.lg_status, sizeof(dbg->texte.lg_status), MSG_ERR_MEMORY_D, pico->RS);
 		else if (dbg->erreur_prog == 4)
-			render_set_text(dbg->texte.lg_status, sizeof(dbg->texte.lg_status),
-				MSG_ERR_INSTRUCTION, pico->OP);
+			render_set_text(dbg->texte.lg_status, sizeof(dbg->texte.lg_status), MSG_ERR_INSTRUCTION_D, pico->OP);
 		else if (dbg->erreur_prog == 5)
-			render_set_text(dbg->texte.lg_status, sizeof(dbg->texte.lg_status),
-				MSG_ERR_CORE);
+			render_set_text(dbg->texte.lg_status, sizeof(dbg->texte.lg_status), MSG_ERR_CORE_D);
 		else
-			render_set_text(dbg->texte.lg_status, sizeof(dbg->texte.lg_status),
-				MSG_ERR_INCONNUE, dbg->erreur_prog);
+			render_set_text(dbg->texte.lg_status, sizeof(dbg->texte.lg_status), MSG_ERR_INCONNUE_D, dbg->erreur_prog);
 		render_set_line(dbg, DBG_STATE_LINE, DBG_FOND_RD);
 		render_lg_col(dbg, DBG_STATE_LINE, 17, dbg->texte.lg_status);
 	}

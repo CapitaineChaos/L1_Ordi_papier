@@ -18,6 +18,6 @@ Description : Déclarations des fonctions du coeur du mini-ordinateur
 #include "pico_types.h"
 
 int	exec_microcode(Mini_ordi *pico, Dbg *dbg, int pos);
-int	boucle_execution_phases(Mini_ordi *pico, Dbg *dbg);
+int	coeur(Mini_ordi *pico, Dbg *dbg);
 
 #endif

@@ -5,9 +5,9 @@
 Auteur : Sylvain Maitre     24002886
 
 Date de création :              01/10/2025
-Date de dernière modification : 11/06/2026
+Date de dernière modification : 19/06/2026
 
-Version du coeur : 1.2
+Version du coeur : 1.3
 
 Fichier     : coeur.c
 Description : Exécution des instructions
@@ -226,13 +226,17 @@ int	exec_microcode(Mini_ordi *pico, Dbg *dbg, int microcode) {
  * @note 3 : Erreur mémoire
  * @note 4 : Instruction inconnue
  * @note 5 : Défaillance processeur
+ * @note 6 : Extinction de Pico
  */
 int	phase(Mini_ordi *pico, Dbg *dbg, t_mcseq *mseq, int phase) {
 	int	i = 0;
 	int	ret = 0;
 
-	if (!mseq || mseq->nb_microcodes == 0)
+	if (!mseq || mseq->nb_microcodes == 0) {
+		if (pico->OP == 0xFF)
+			return (6);
 		return (4);
+	}
 	if (mseq->cond && !mseq->cond(pico))
 		return (0);
 	
@@ -263,8 +267,9 @@ int	phase(Mini_ordi *pico, Dbg *dbg, t_mcseq *mseq, int phase) {
  * @note 3 : Erreur mémoire
  * @note 4 : Instruction inconnue
  * @note 5 : Défaillance processeur
+ * @note 6 : Extinction de Pico
  */
-int	boucle_execution_phases(Mini_ordi *pico, Dbg *dbg) {
+int	coeur(Mini_ordi *pico, Dbg *dbg) {
 	int	ret = 0;
 	t_mcseq phase_1 = {
 		.cond = NULL,

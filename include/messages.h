@@ -5,7 +5,7 @@
 Auteur : Sylvain Maitre     24002886
 
 Date de création :              03/10/2025
-Date de dernière modification : 13/06/2026
+Date de dernière modification : 19/06/2026
 
 Fichier     : mini_ordi.h
 Description : Définitions des messages utilisés dans le programme
@@ -117,11 +117,15 @@ void	msg_print_hex(int val);
 # define MSG_OPT_ADRESSE		"-a/--adresse"
 # define MSG_OPT_TAILLE			"-t/--taille"
 
-# define MSG_ERR_MEMORY			FOND_ALERT BLK "  Erreur de mémoire : " BLD "%02X" RST FOND_ALERT BLK " - Arrêt du programme\n " RSTFG
-# define MSG_ERR_INSTRUCTION	FOND_ALERT BLK "Instruction inconnue : " BLD "%02X" RST FOND_ALERT BLK " - Arrêt du programme\n" RSTFG
-# define MSG_ERR_CORE			FOND_ALERT BLK "    Défaillance du cœur - Arrêt du programme\n    " RSTFG
-# define MSG_ERR_INCONNUE		FOND_ALERT BLK " Erreur inconnue : code " BLD "%d" RST FOND_ALERT BLK " - Arrêt du programme\n " RSTFG
+# define MSG_ERR_MEMORY_D		FOND_ALERT BLK "  Erreur de mémoire : " BLD "%02X" RST FOND_ALERT BLK " - Arrêt du programme\n " RSTFG
+# define MSG_ERR_INSTRUCTION_D	FOND_ALERT BLK "Instruction inconnue : " BLD "%02X" RST FOND_ALERT BLK " - Arrêt du programme\n" RSTFG
+# define MSG_ERR_CORE_D			FOND_ALERT BLK "    Défaillance du cœur - Arrêt du programme\n    " RSTFG
+# define MSG_ERR_INCONNUE_D		FOND_ALERT BLK " Erreur inconnue : code " BLD "%d" RST FOND_ALERT BLK " - Arrêt du programme\n " RSTFG
 
+# define MSG_ERR_MEMORY			"Erreur de mémoire : %02X - Arrêt du programme\n "
+# define MSG_ERR_INSTRUCTION	"Instruction inconnue : %02X - Arrêt du programme\n"
+# define MSG_ERR_CORE			"Défaillance du cœur - Arrêt du programme\n    "
+# define MSG_ERR_INCONNUE		"Erreur inconnue : code %d - Arrêt du programme\n "
 
 # define DBG_TOP_TITRE			MODE_FONCE BLD "                                   PICO v1.0                                    " RST
 # define DBG_TOP_MENU(i, o)		"%s%s%s%s%s", FOND_FONCE "    Quitter " L_YL "[Q]" RSTFG "       Sortir " L_YL "[S]" RSTFG "       Aide " L_YL "[H]" RSTFG "       Buffers ", (i) ? L_YL : G_04, "[I]" RSTFG "/", (o) ? L_YL : G_04, "[O]" RST

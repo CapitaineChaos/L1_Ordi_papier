@@ -5,7 +5,7 @@
 Auteur : Sylvain Maitre     24002886
 
 Date de création :              07/06/2026
-Date de dernière modification : 13/06/2026
+Date de dernière modification : 19/06/2026
 
 Fichier     : messages.c
 Description : Affichage des messages utilisés dans le programme
@@ -47,8 +47,8 @@ void	msg_print_usage(const char *nom) {
 }
 
 void	msg_print_error(Mini_ordi *pico, int code) {
-	if (!code)
-		return;
+	if (!code || code == 6)
+		return ;
 	if (code == 3)
 		fprintf(stderr, MSG_ERR_MEMORY, pico->RS);
 	else if (code == 4)

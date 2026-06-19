@@ -5,12 +5,13 @@
 Auteur : Sylvain Maitre     24002886
 
 Date de création :              01/10/2025
-Date de dernière modification : 13/06/2026
+Date de dernière modification : 19/06/2026
 
 Description : Point d'entrée du programme
 Compilation : make
 Execution   : ./cx25.1 [-dbhv]
 
+Remarque : Ne fonctionnera pas sur Windows
 ==============================================================================*/
 
 #include <getopt.h>
@@ -131,7 +132,7 @@ int	main(int ac, char** av) {
 	pico.dbg = &dbg;
 
 	charger_microsequences(&pico);
-	while ((ret = boucle_execution_phases(&pico, &dbg))) {
+	while ((ret = coeur(&pico, &dbg))) {
 		if (ret < 3 || !pico.modes.debogage)
 			break;
 		dbg.erreur_prog = ret;

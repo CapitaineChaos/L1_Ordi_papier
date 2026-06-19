@@ -1,0 +1,37 @@
+50	;	Adresse de début du programme
+26	;	Longueur du programme (0x76 - 0x50)
+
+;Début:
+
+	00 00	;	50 51		LOAD    #    00       A ← 0
+	48 5C	;	50 53		STORE   α    r        r ← A
+	49 5A	;	54 55		IN      α    a        a ← Entrée
+	49 5B	;	56 57		IN      α    b        b ← Entrée
+	10 5D	;	58 59		JUMP    α    Prog
+
+	00   	;	5A   		variable a
+	00   	;	5B   		variable b
+	00   	;	5C   		variable r
+	
+;Prog:
+
+	40 5A	;	5D 5E		LOAD    α    a
+	12 73	;	5F 60		BRZ     α    Fin
+
+;Boucle:
+
+	40 5B	;	61 62		LOAD    α    b
+	12 73	;	63 64		BRZ     α    Fin
+	40 5C	;	65 66		LOAD    α    r
+	60 5A	;	67 68		ADD     α    a
+	48 5C	;	69 6A		STORE   α    r
+	40 5B	;	6B 6C		LOAD    α    b
+	21 01	;	6D 6E		SUB     #    1
+	48 5B	;	6F 70		STORE   α    b
+	10 61	;	71 72		JUMP    α    Boucle
+	
+;Fin:
+	
+	41 5C	;	73 74		OUT     α    r        Sortie ← r
+	FF   	;	75   		Crash volontaire
+
