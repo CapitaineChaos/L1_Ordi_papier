@@ -172,14 +172,16 @@ void	dbg_display_trop_petit(Dbg *dbg) {
 	tty = dbg_get_tty(dbg);
 	if (!tty)
 		return;
-	// Affiché une seule fois : pas de réimpression à chaque resize (sinon vibration)
-	if (dbg->terminal.petit_affiche)
-		return;
-	dbg_display_leave(dbg);
-	// D_NO_WRAP : la ligne ne se replie pas selon la largeur, le message ne se
-	// déplace donc plus quand on redimensionne le terminal
-	fprintf(tty, RST D_NO_WRAP D_SHOW_CURSOR D_HOME E_SCREEN_ALL "%s", DBG_STATE_SMALL_TERM);
-	dbg->terminal.petit_affiche = true;
+	// Première bascule : on RESTE sur l'écran alterné (pas de scrollback ni de
+	// défilement, contrairement à l'écran principal) et on l'efface une seule fois
+	if (!dbg->terminal.petit_affiche) {
+		dbg_display_enter(dbg);
+		fprintf(tty, RST D_NO_WRAP D_HIDE_CURSOR E_SCREEN_ALL);
+		dbg->terminal.petit_affiche = true;
+		dbg->screen.initialise = false;
+	}
+	// Message réécrit en place à HOME, sans effacer l'écran : ni flash ni copie
+	// qui défile lorsqu'on redimensionne le terminal
+	fprintf(tty, D_HOME "%s", DBG_STATE_SMALL_TERM);
 	fflush(tty);
-	dbg->screen.initialise = false;
 }
