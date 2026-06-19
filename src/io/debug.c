@@ -52,6 +52,8 @@ static void	afficher_invite_debug_entree(Mini_ordi *pico, const char *hex) {
 		dbg_display_interaction(dbg);
 }
 
+
+
 /**
  * @brief Lit une entrée hexadécimale de l'utilisateur en mode débogueur
  * @param pico Le mini-ordinateur
@@ -59,14 +61,20 @@ static void	afficher_invite_debug_entree(Mini_ordi *pico, const char *hex) {
  */
 static u8	lire_entree_debug_utilisateur(Mini_ordi *pico) {
 	FILE	*stream;
+	FILE	*tty;
 	char	hex[3];
 	size_t	len;
 	int		c;
 	int		echappement;
 	u8		val;
 
+	tty = dbg_get_tty(pico->dbg);
+	if (!tty)
+		return (DBG_CMD_STOP_DBG);
+
 	stream = io_flux_entree_utilisateur(pico);
-	hex[0] = '\0';
+	hex[0] = '0';
+	hex[1] = '0';
 	hex[2] = '\0';
 	len = 0;
 	echappement = 0;
@@ -77,10 +85,10 @@ static u8	lire_entree_debug_utilisateur(Mini_ordi *pico) {
 	while (true) {
 		c = fgetc(stream);
 		if (c == EOF) {
-			if (ferror(stream) && errno == EINTR) {
+			if (ferror(stream) && errno == EINTR && dbg_resize_recu()) {
 				clearerr(stream);
+				dbg_resize_reset();
 				if (dbg_resize_recu()) {
-					dbg_resize_reset();
 					afficher_invite_debug_entree(pico, hex);
 					dbg_display_raw_enter(pico->dbg);
 				}
@@ -114,20 +122,23 @@ static u8	lire_entree_debug_utilisateur(Mini_ordi *pico) {
 		}
 		// Backspace pour effacer le dernier caractère entré
 		if ((c == 127 || c == '\b') && len > 0) {
-			hex[--len] = '\0';
+			hex[1] = hex[0];
+			hex[0] = '0';
+			len--;
 			afficher_invite_debug_entree(pico, hex);
 			continue;
 		}
 		// Entrée valide (hexadécimale) pour construire l'octet à saisir
-		if ((c == '\n' || c == '\r') && len == 2)
+		if ((c == '\n' || c == '\r') && len > 0 && len < 3)
 			break;
 		if (isxdigit((unsigned char)c) && len < 2) {
-			hex[len++] = (char)toupper((unsigned char)c);
-			hex[len] = '\0';
+			hex[0] = hex[1];
+			hex[1] = (char)toupper((unsigned char)c);
+			len++;
 			afficher_invite_debug_entree(pico, hex);
 		}
 	}
-	dbg_display_raw_leave(pico->dbg);
+	// dbg_display_raw_leave(pico->dbg);
 	io_parse_hex_byte(hex, &val);
 	return (val);
 }

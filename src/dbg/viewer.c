@@ -208,8 +208,7 @@ static void	composer_instruction(Mini_ordi *pico, Dbg *dbg, int phase, int pos) 
  */
 static void	composer_mode(Dbg *dbg) {
 	if (dbg->texte.lg_mode[0] == '\0')
-		render_set_text(dbg->texte.lg_mode, sizeof(dbg->texte.lg_mode),
-			DBG_MODE_MICROCODE);
+		render_set_text(dbg->texte.lg_mode, sizeof(dbg->texte.lg_mode), DBG_MODE_MICROCODE);
 	render_set_line(dbg, 23, BGG_06 DBG_EMPTY_LINE);
 	render_lg_col(dbg, 23, 26, dbg->texte.lg_mode);
 }

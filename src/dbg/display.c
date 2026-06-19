@@ -216,8 +216,7 @@ void	dbg_display_trop_petit(Dbg *dbg) {
 	if (dbg->terminal.petit_affiche)
 		return;
 	dbg_display_leave(dbg);
-	fprintf(tty, RST D_WRAP D_SHOW_CURSOR D_HOME E_SCREEN_ALL "%s\n",
-		DBG_STATE_SMALL_TERM);
+	fprintf(tty, RST D_WRAP D_SHOW_CURSOR D_HOME E_SCREEN_ALL "%s\n", DBG_STATE_SMALL_TERM);
 	dbg->terminal.petit_affiche = true;
 	fflush(tty);
 	dbg->screen.initialise = false;

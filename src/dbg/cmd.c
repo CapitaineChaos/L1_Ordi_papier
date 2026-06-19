@@ -49,11 +49,11 @@ static void	afficher_attente(Mini_ordi *pico, Dbg *dbg, bool err, const char *st
 	FILE	*tty;
 
 	tty = dbg_get_tty(dbg);
+	(void)tty;
 	// Si le terminal est trop petit on bascule sur un affichage minimaliste
 	if (!dbg_display_terminal_ok(dbg))
 	{
 		dbg_display_trop_petit(dbg);
-		(void)tty;
 		return;
 	}
 	// Si y a eu une erreur précédemment
@@ -85,6 +85,84 @@ static void	afficher_attente(Mini_ordi *pico, Dbg *dbg, bool err, const char *st
 	dbg_display_interaction(dbg);
 }
 
+
+// void get_str(Mini_ordi *pico, Dbg *dbg, FILE *tty, char *str, size_t max_size) {
+// 	int		echappement;
+// 	int		c;
+// 	size_t	len;
+
+// 	len = 0;
+// 	echappement = 0;
+
+// 	while (true) {
+// 		c = fgetc(tty);
+// 		if (c == EOF) {
+// 			// Si on reçoit un signal de redimensionnement du terminal, on redessine l'écran
+// 			if (ferror(tty) && errno == EINTR && dbg_resize_recu()) {
+// 				clearerr(tty);
+// 				dbg_resize_reset();
+// 				if (dbg->terminal.petit_affiche && dbg_display_terminal_ok(dbg) && len == 0) {
+// 					dbg_display_raw_leave(dbg);
+// 					return (DBG_CMD_REFRESH);
+// 				}
+// 				afficher_attente(pico, dbg, err, str);
+// 				dbg_display_raw_enter(dbg);
+// 				continue;
+// 			}
+// 			else if (ferror(tty) && errno == EINTR) {
+// 				clearerr(tty);
+// 				continue;
+// 			}
+// 			if (feof(tty))
+// 				exit(0);
+// 			dbg_display_raw_leave(dbg);
+// 			return (DBG_CMD_STOP_DBG);
+// 		}
+// 		// Ctrl+C ou Ctrl+D pour quitter le débogueur
+// 		if (c == 3 || c == 4) {
+// 			dbg_display_raw_leave(dbg);
+// 			dbg_display_leave(dbg);
+// 			exit(0);
+// 		}
+// 		// Ignorer les séquences d'échappement ANSI pour les touches fléchées et autres
+// 		if (c == 27) {
+// 			echappement = 1;
+// 			continue;
+// 		}
+// 		// Si on est dans une séquence d'échappement, on ignore les caractères suivants jusqu'à la fin de la séquence
+// 		if (echappement == 1) {
+// 			echappement = (c == '[' || c == 'O') ? 2 : 0;
+// 			continue;
+// 		}
+// 		// Si on est dans une séquence d'échappement, on ignore les caractères suivants jusqu'à la fin de la séquence
+// 		if (echappement == 2) {
+// 			if (c >= '@' && c <= '~')
+// 				echappement = 0;
+// 			continue;
+// 		}
+// 		if (c == '\n' || c == '\r')
+// 			break;
+// 		if (len == 0) {
+// 			dbg_cmd	direct = dbg_key_directe(pico, c);
+// 			if (direct != DBG_CMD_NONE) {
+// 				dbg_display_raw_leave(dbg);
+// 				return (direct);
+// 			}
+// 		}
+// 		if ((c == 127 || c == '\b') && len > 0) {
+// 			len--;
+// 			str[len] = '\0';
+// 			afficher_attente(pico, dbg, err, str);
+// 			continue;
+// 		}
+// 		if (isprint((unsigned char)c) && len + 1 < max_size) {
+// 			str[len++] = c;
+// 			str[len] = '\0';
+// 			afficher_attente(pico, dbg, err, str);
+// 		}
+// 	}
+// }
+
 /**
  * @brief Lit une ligne de commande saisie par l'utilisateur
  * @param dbg Le débogueur
@@ -94,7 +172,7 @@ static void	afficher_attente(Mini_ordi *pico, Dbg *dbg, bool err, const char *st
  * @note Mettre à jour à chaque touche appuyée
  * @return Le code de commande lu
  */
-static dbg_cmd	lire_ligne_commande(Mini_ordi *pico, Dbg *dbg, bool err, char *str, size_t size) {
+static dbg_cmd	lire_ligne_commande(Mini_ordi *pico, Dbg *dbg, bool err, char *str, size_t max_size) {
 	FILE	*tty;
 	size_t	len;
 	int		c;
@@ -120,11 +198,12 @@ static dbg_cmd	lire_ligne_commande(Mini_ordi *pico, Dbg *dbg, bool err, char *st
 					dbg_display_raw_leave(dbg);
 					return (DBG_CMD_REFRESH);
 				}
+				//dbg_display_draw(dbg);
 				afficher_attente(pico, dbg, err, str);
 				dbg_display_raw_enter(dbg);
 				continue;
 			}
-			if (ferror(tty) && errno == EINTR) {
+			else if (ferror(tty) && errno == EINTR) {
 				clearerr(tty);
 				continue;
 			}
@@ -170,7 +249,7 @@ static dbg_cmd	lire_ligne_commande(Mini_ordi *pico, Dbg *dbg, bool err, char *st
 			afficher_attente(pico, dbg, err, str);
 			continue;
 		}
-		if (isprint((unsigned char)c) && len + 1 < size) {
+		if (isprint((unsigned char)c) && len + 1 < max_size) {
 			str[len++] = c;
 			str[len] = '\0';
 			afficher_attente(pico, dbg, err, str);
@@ -193,8 +272,7 @@ dbg_cmd	attente_commande(Mini_ordi *pico, Dbg *dbg, bool err) {
 		dbg_display_leave(dbg);
 		exit(0);
 	}
-	if (ret == DBG_CMD_SHOW_HELP || ret == DBG_CMD_SHOW_INPUT
-		|| ret == DBG_CMD_SHOW_OUTPUT)
+	if (ret == DBG_CMD_SHOW_HELP || ret == DBG_CMD_SHOW_INPUT || ret == DBG_CMD_SHOW_OUTPUT)
 		return (attendre_menu(pico, dbg, ret));
 	if (ret != DBG_CMD_NONE)
 		return (ret);
