@@ -57,7 +57,8 @@ static u8	lire_entree_classique(Mini_ordi *pico, u8 PC) {
 	}
 	msg_print_input_prompt(&pico->modes);
 	stream = io_flux_entree_utilisateur(pico);
-	while (!io_lire_octet_hex(stream, &val))
+	// Ici l'entrée devrait se fait au clavier
+	while (!io_lire_octet_hex(stream, &val, true))
 		continue;
 	return (val);
 }

@@ -22,6 +22,75 @@ Description : Fonctions de débogage
 #include "coeur.h"
 #include "debogueur/libelles.h"
 
+
+
+/**
+ * @brief Attente des commandes du débogueur.
+ * @param pico 
+ * @param dbg 
+ * @param cmd 
+ * @param phase 
+ * @param mseq 
+ * @param pos 
+ * @return true si le débogueur doit continuer, false si le débogueur doit quitter
+ */
+bool	attente_commandes(Mini_ordi *pico, Dbg *dbg, dbg_cmd cmd, int phase, t_mcseq *mseq, int pos) {
+
+	while (cmd == DBG_CMD_NONE || cmd == DBG_CMD_UNKNOWN || cmd == DBG_CMD_HELP || cmd == DBG_CMD_REFRESH)
+	{
+		cmd = attente_commande(pico, dbg, cmd == DBG_CMD_UNKNOWN);
+
+		if (cmd == DBG_CMD_STOP_DBG) {
+			dbg_display_leave(dbg);
+			pico->modes.debogage = false;
+			return true;
+		}
+
+		if (cmd == DBG_CMD_EXEC_MICROCODE) {
+			int num_microcode = dbg->exec.microcode_a_executer;
+			render_set_line(dbg, DBG_STATE_LINE, DBG_STATE_FOND);
+			render_lg_col(dbg, DBG_STATE_LINE, 1, DBG_STATE_EXEC_MICRO,
+				num_microcode);
+			exec_microcode(pico, dbg, num_microcode);
+			cmd = DBG_CMD_NONE;
+		}
+
+		/** En cas de redimensionnement */
+		if (cmd == DBG_CMD_REFRESH) {
+			if (compositeur_ecran(pico, dbg, phase, mseq, pos))
+				dbg_display_draw(dbg);
+			cmd = DBG_CMD_NONE;
+			return true;
+		}
+
+		if (cmd == DBG_CMD_JUMP)
+			return true;
+
+		if (cmd == DBG_CMD_NEXT_MICROCODE || (cmd == DBG_CMD_AUTO && dbg->exec.mode_defaut == DBG_DEF_MICROCODE)) {
+			dbg->exec.next_microcode = true;
+			dbg->exec.next_phase = false;
+			dbg->exec.next_instruction = false;
+			return true;
+		}
+		if (cmd == DBG_CMD_NEXT_PHASE || (cmd == DBG_CMD_AUTO && dbg->exec.mode_defaut == DBG_DEF_PHASE)) {
+			dbg->exec.next_microcode = false;
+			dbg->exec.next_phase = true;
+			dbg->exec.next_instruction = false;
+			return true;
+		}
+		if (cmd == DBG_CMD_NEXT_INSTRUCTION || (cmd == DBG_CMD_AUTO && dbg->exec.mode_defaut == DBG_DEF_INSTRUCTION)) {
+			dbg->exec.next_microcode = false;
+			dbg->exec.next_phase = false;
+			dbg->exec.next_instruction = true;
+			return true;
+		}
+
+		if (compositeur_ecran(pico, dbg, phase, mseq, pos))
+			dbg_display_draw(dbg);
+	}
+	return false;
+}
+
 /**
  * @brief Exécute le débogueur.
  * @note C'est le coeur du débogueur.
@@ -46,7 +115,7 @@ void	exec_debogueur(Mini_ordi *pico, Dbg *dbg, int phase, t_mcseq *mseq, int pos
 		// Mais on en est certain que si une demande d'entrée est faite (mc16)
 		if (pico->PC < 32 && IO_STDIN_EMPTY && mseq->sequence[pos] == 16) {
 			pico->modes.bootstrap = true;
-			vider_etat_temporaire(dbg, false);
+			vider_etat_temporaire(dbg);
 			render_set_text(dbg->texte.lg_status,sizeof(dbg->texte.lg_status), DBG_STATE_BOOTSTRAP_DEBUG);
 		}
 		// Faire en sorte de positionner PC sur le début du programme
@@ -54,7 +123,7 @@ void	exec_debogueur(Mini_ordi *pico, Dbg *dbg, int phase, t_mcseq *mseq, int pos
 			return;
 		else {
 			pico->modes.bootstrap = true;
-			vider_etat_temporaire(dbg, false);
+			vider_etat_temporaire(dbg);
 		}
 	}
 
@@ -85,56 +154,8 @@ void	exec_debogueur(Mini_ordi *pico, Dbg *dbg, int phase, t_mcseq *mseq, int pos
 			dbg_display_draw(dbg);
 	}
 
-	while (cmd == DBG_CMD_NONE || cmd == DBG_CMD_UNKNOWN || cmd == DBG_CMD_HELP || cmd == DBG_CMD_REFRESH)
-	{
-		cmd = attente_commande(pico, dbg, cmd == DBG_CMD_UNKNOWN);
-
-		if (cmd == DBG_CMD_STOP_DBG) {
-			dbg_display_leave(dbg);
-			pico->modes.debogage = false;
-			return;
-		}
-
-		if (cmd == DBG_CMD_EXEC_MICROCODE) {
-			int num_microcode = dbg->exec.microcode_a_executer;
-			render_set_line(dbg, DBG_STATE_LINE, DBG_STATE_FOND);
-			render_lg_col(dbg, DBG_STATE_LINE, 1, DBG_STATE_EXEC_MICRO,
-				num_microcode);
-			exec_microcode(pico, dbg, num_microcode);
-			cmd = DBG_CMD_NONE;
-		}
-
-		/** En cas de redimensionnement */
-		if (cmd == DBG_CMD_REFRESH) {
-			if (compositeur_ecran(pico, dbg, phase, mseq, pos))
-				dbg_display_draw(dbg);
-			cmd = DBG_CMD_NONE;
-			return;
-		}
-
-		if (cmd == DBG_CMD_JUMP)
-			return;
-
-		if (cmd == DBG_CMD_NEXT_MICROCODE || (cmd == DBG_CMD_AUTO && dbg->exec.mode_defaut == DBG_DEF_MICROCODE)) {
-			dbg->exec.next_microcode = true;
-			dbg->exec.next_phase = false;
-			dbg->exec.next_instruction = false;
-			return;
-		}
-		if (cmd == DBG_CMD_NEXT_PHASE || (cmd == DBG_CMD_AUTO && dbg->exec.mode_defaut == DBG_DEF_PHASE)) {
-			dbg->exec.next_microcode = false;
-			dbg->exec.next_phase = true;
-			dbg->exec.next_instruction = false;
-			return;
-		}
-		if (cmd == DBG_CMD_NEXT_INSTRUCTION || (cmd == DBG_CMD_AUTO && dbg->exec.mode_defaut == DBG_DEF_INSTRUCTION)) {
-			dbg->exec.next_microcode = false;
-			dbg->exec.next_phase = false;
-			dbg->exec.next_instruction = true;
-			return;
-		}
-
-		if (compositeur_ecran(pico, dbg, phase, mseq, pos))
-			dbg_display_draw(dbg);
+	if (attente_commandes(pico, dbg, cmd, phase, mseq, pos)) {
+		return;
 	}
+
 }

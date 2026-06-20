@@ -1,6 +1,6 @@
 /*==============/                    cx25.1                    \================
 =~~~~~~~~~~~~~=|              Ordinateur en papier              |=~~~~~~~~~~~~~=
-================\              Types opaques du pico            /================
+================\            Types de retour de Pico           /================
 
 Auteur : Sylvain Maitre     24002886
 
@@ -23,11 +23,17 @@ typedef struct s_mini_ordi		Mini_ordi;
 typedef struct s_modes			Modes;
 typedef struct s_dbg			Dbg;
 
-/* Codes d'erreur renvoyés par le cœur et affichés par le programme */
-enum	pico_erreur {
-	PICO_ERR_MEMOIRE		= 3,
-	PICO_ERR_INSTRUCTION	= 4,
-	PICO_ERR_COEUR			= 5,
+/* Codes renvoyés par le cœur et affichés par le programme */
+enum	pico_status {
+	PICO_OK					= 0,
+	PICO_JUMP_PHASE_1		= 1,
+	PICO_FIN_PHASE			= 2,
+	PICO_ERR_MEMOIRE		= 4,
+	PICO_ERR_INSTRUCTION	= 8,
+	PICO_ERR_COEUR			= 16,
+	PICO_STOP				= 32
 };
+
+typedef enum pico_status	pstatus;
 
 #endif

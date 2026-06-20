@@ -201,20 +201,20 @@ t_microfonction	g_microfonctions[18] = {
  * @param microcode Le numéro du microcode à exécuter (1 à 17)
  * @return Code de retour d'execution ou de problème
  */
-int	exec_microcode(Mini_ordi *pico, Dbg *dbg, int microcode) {
+pstatus	exec_microcode(Mini_ordi *pico, Dbg *dbg, int microcode) {
 	t_microfonction	p_microfct = NULL;
 
 	if (microcode <= 0 || microcode >= 18)
-		return (5);
+		return (PICO_ERR_COEUR);
 
 	p_microfct = g_microfonctions[microcode];
 	if (!p_microfct)
-		return (5);
+		return (PICO_ERR_COEUR);
 
 	if (dbg)
 		dbg->exec.microcode_precedent = microcode;
 
-	return (p_microfct(pico));
+	return ((pstatus)(p_microfct(pico)));
 }
 
 /**
@@ -228,31 +228,31 @@ int	exec_microcode(Mini_ordi *pico, Dbg *dbg, int microcode) {
  * @note 5 : Défaillance processeur
  * @note 6 : Extinction de Pico
  */
-int	phase(Mini_ordi *pico, Dbg *dbg, t_mcseq *mseq, int phase) {
-	int	i = 0;
-	int	ret = 0;
+pstatus	phase(Mini_ordi *pico, Dbg *dbg, t_mcseq *mseq, int phase) {
+	int		i = 0;
+	pstatus	status = PICO_OK;
 
 	if (!mseq || mseq->nb_microcodes == 0) {
 		if (pico->OP == 0xFF)
-			return (6);
-		return (4);
+			return (PICO_STOP);
+		return (PICO_ERR_INSTRUCTION);
 	}
 	if (mseq->cond && !mseq->cond(pico))
-		return (0);
+		return (PICO_OK);
 	
 	while (i < mseq->nb_microcodes)
 	{
 		exec_debogueur(pico, dbg, phase, mseq, i);
 		if (dbg && dbg->exec.restart_cycle) {
 			dbg->exec.restart_cycle = false;
-			return (1);
+			return (PICO_JUMP_PHASE_1);
 		}
-		ret = exec_microcode(pico, dbg, mseq->sequence[i]);
-		if (ret) return (ret);
+		status = exec_microcode(pico, dbg, mseq->sequence[i]);
+		if (status) return (status);
 		i++;
 	}
 
-	return (0);
+	return (PICO_FIN_PHASE);
 }
 
 
@@ -269,32 +269,32 @@ int	phase(Mini_ordi *pico, Dbg *dbg, t_mcseq *mseq, int phase) {
  * @note 5 : Défaillance processeur
  * @note 6 : Extinction de Pico
  */
-int	coeur(Mini_ordi *pico, Dbg *dbg) {
-	int	ret = 0;
-	t_mcseq phase_1 = {
+pstatus	coeur(Mini_ordi *pico, Dbg *dbg) {
+	pstatus	status = PICO_OK;
+	t_mcseq	phase_1 = {
 		.cond = NULL,
 		.nb_microcodes = 4,
 		.sequence = {1, 13, 5, 15}
 	};
-	t_mcseq phase_3 = {
+	t_mcseq	phase_3 = {
 		.cond = NULL,
 		.nb_microcodes = 1,
 		.sequence = {15}
 	};
 
-	while (ret < 3)
+	while (status < PICO_ERR_MEMOIRE)
 	{
 		if (pico->modes.verbeux && !pico->modes.debogage)
 			printf(".");
-		ret = phase(pico, dbg, &phase_1, 1);
-		if (ret == 1) continue;
-		if (ret > 2) return (ret);
-		ret = phase(pico, dbg, &pico->microsequences[pico->OP], 2);
-		if (ret == 1) continue;
-		if (ret > 2) return (ret);
-		ret = phase(pico, dbg, &phase_3, 3);
-		if (ret == 1) continue;
-		if (ret > 2) return (ret);
+		status = phase(pico, dbg, &phase_1, 1);
+		if (status == PICO_JUMP_PHASE_1) continue;
+		if (status > PICO_FIN_PHASE) return (status);
+		status = phase(pico, dbg, &pico->microsequences[pico->OP], 2);
+		if (status == PICO_JUMP_PHASE_1) continue;
+		if (status > PICO_FIN_PHASE) return (status);
+		status = phase(pico, dbg, &phase_3, 3);
+		if (status == PICO_JUMP_PHASE_1) continue;
+		if (status > PICO_FIN_PHASE) return (status);
 	}
-	return (0);
+	return (PICO_OK);
 }

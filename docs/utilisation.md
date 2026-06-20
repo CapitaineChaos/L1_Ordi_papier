@@ -20,7 +20,7 @@ echo "80 09 49 32 41 32 49 33 41 33 FF" | bin/pico
 ### Pipe
 
 ```bash
-cat exemples/simple.hex | bin/pico
+cat exemples/simple.hex | bin/pico  | xxd -r -ps; echo;
 ```
 
 ### Redirection de l'entrée standard
@@ -60,7 +60,8 @@ EOF
 ### Here-string
 
 ```bash
-bin/pico -d <<< "80 09 49 32 41 32 49 33 41 33 FF"
+bash
+bin/pico <<< "801F004848704170006548704170006C48704170006C48704170006F48704170FF" | xxd -r -ps; echo;
 ```
 
 ### Fichier en argument

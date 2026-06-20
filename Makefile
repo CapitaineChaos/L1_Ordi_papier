@@ -26,7 +26,6 @@ DEPENDS = $(OBJECTS:.o=.d)
 
 .PHONY: all $(NAME) clean distclean help re usage help
 
-include Makefile.tests.mk
 
 # Règle par défaut
 all: $(TARGET)
@@ -89,7 +88,7 @@ usage:
 help:
 	@echo ""
 	@echo "${BPINK}Cibles disponibles :${RESET}"
-	@echo "  ${BCYAN}${NAME}${RESET}   - Compile le programme"
+	@echo "  ${BCYAN}${NAME}${RESET}      - Compile le programme"
 	@echo "  ${BCYAN}all${RESET}       - Compile le programme"
 	@echo "  ${BCYAN}clean${RESET}     - Supprime les fichiers objets et dépendances ($(BUILDDIR)/)"
 	@echo "  ${BCYAN}distclean${RESET} - Supprime tous les fichiers générés ($(BUILDDIR)/ et $(BINDIR)/)"
@@ -102,4 +101,7 @@ help:
 	@echo "  ${BCYAN}$(BUILDDIR)/${RESET}   - Fichiers objets (.o) et dépendances (.d)"
 	@echo "  ${BCYAN}$(BINDIR)/${RESET}     - Exécutables"
 	@echo ""
+
+include Makefile.tests.mk
+
 

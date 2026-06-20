@@ -87,15 +87,17 @@ void	compositeur_bottom(Dbg *dbg, int line) {
 static void	compositeur_status_attente(Mini_ordi *pico, Dbg *dbg, bool err) {
 	size_t	sz = sizeof(dbg->texte.lg_status);
 
-	if (dbg->erreur_prog) {
-		if (dbg->erreur_prog == PICO_ERR_MEMOIRE)
+	if (dbg->status_proc) {
+		if (dbg->status_proc == PICO_ERR_MEMOIRE)
 			render_set_text(dbg->texte.lg_status, sz, MSG_ERR_MEMORY_D, pico->RS);
-		else if (dbg->erreur_prog == PICO_ERR_INSTRUCTION)
+		else if (dbg->status_proc == PICO_ERR_INSTRUCTION)
 			render_set_text(dbg->texte.lg_status, sz, MSG_ERR_INSTRUCTION_D, pico->OP);
-		else if (dbg->erreur_prog == PICO_ERR_COEUR)
+		else if (dbg->status_proc == PICO_ERR_COEUR)
 			render_set_text(dbg->texte.lg_status, sz, MSG_ERR_CORE_D);
+		else if (dbg->status_proc == PICO_STOP)
+			render_set_text(dbg->texte.lg_status, sz, MSG_ERR_STOP_D);
 		else
-			render_set_text(dbg->texte.lg_status, sz, MSG_ERR_INCONNUE_D, dbg->erreur_prog);
+			render_set_text(dbg->texte.lg_status, sz, MSG_ERR_INCONNUE_D, dbg->status_proc);
 		render_set_line(dbg, DBG_STATE_LINE, DBG_FOND_RD);
 		render_lg_col(dbg, DBG_STATE_LINE, 17, dbg->texte.lg_status);
 	}

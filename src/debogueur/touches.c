@@ -29,9 +29,15 @@ dbg_cmd	dbg_key_directe(Mini_ordi *pico, int c) {
 		return (DBG_CMD_STOP_DBG);
 	if (c == 'h' || c == '?')
 		return (DBG_CMD_SHOW_HELP);
-	if (c == 'i' && IO_STDIN_AVAILABLE)
-		return (DBG_CMD_SHOW_INPUT);
-	if (c == 'o' && IO_OUTPUT_AVAILABLE)
-		return (DBG_CMD_SHOW_OUTPUT);
+	if (c == 'i') {
+		if (IO_STDIN_AVAILABLE)
+			return (DBG_CMD_SHOW_INPUT);
+		return (DBG_CMD_UNAVAILABLE);
+	}
+	if (c == 'o') {
+		if (IO_OUTPUT_AVAILABLE)
+			return (DBG_CMD_SHOW_OUTPUT);
+		return (DBG_CMD_UNAVAILABLE);
+	}
 	return (DBG_CMD_NONE);
 }

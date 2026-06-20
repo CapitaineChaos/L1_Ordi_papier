@@ -14,6 +14,7 @@ Description : Affichage des messages utilisés dans le programme
 
 #include "messages.h"
 #include "pico.h" // IWYU pragma: keep
+#include "pico_types.h"
 #include <signal.h>
 #include <stdio.h>
 
@@ -46,17 +47,17 @@ void	msg_print_usage(const char *nom) {
 	printf(MSG_USAGE, nom, nom, nom);
 }
 
-void	msg_print_error(Mini_ordi *pico, int code) {
-	if (!code || code == 6)
+void	msg_print_error(Mini_ordi *pico, pstatus status) {
+	if (!status || status == PICO_STOP)
 		return ;
-	if (code == PICO_ERR_MEMOIRE)
+	if (status == PICO_ERR_MEMOIRE)
 		fprintf(stderr, MSG_ERR_MEMORY, pico->RS);
-	else if (code == PICO_ERR_INSTRUCTION)
+	else if (status == PICO_ERR_INSTRUCTION)
 		fprintf(stderr, MSG_ERR_INSTRUCTION, pico->OP);
-	else if (code == PICO_ERR_COEUR)
+	else if (status == PICO_ERR_COEUR)
 		fprintf(stderr, MSG_ERR_CORE);
 	else
-		fprintf(stderr, MSG_ERR_INCONNUE, code);
+		fprintf(stderr, MSG_ERR_INCONNUE, status);
 }
 
 void	msg_print_debug_help(void) {

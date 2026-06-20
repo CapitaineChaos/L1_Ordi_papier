@@ -45,7 +45,7 @@ bool	io_parse_hex_byte(const char *hex, u8 *val) {
  * @param val Pointeur vers l'octet résultant
  * @return true si la lecture a réussi, false sinon
  */
-bool	io_lire_octet_hex(FILE *stream, u8 *val) {
+bool	io_lire_octet_hex(FILE *stream, u8 *val, bool clavier) {
 	bool	commentaire;
 	char	hex[3];
 	int		i;
@@ -53,13 +53,22 @@ bool	io_lire_octet_hex(FILE *stream, u8 *val) {
 
 	commentaire = false;
 	i = 0;
+	hex[0] = '\0';
+	hex[1] = '\0';
 	hex[2] = '\0';
 	while (i < 2) {
 		c = fgetc(stream);
 		if (c == EOF)
 			return (false);
 		if (c == '\n')
+		{
+			if (clavier && i > 0) {
+				hex[1] = hex[0];
+				hex[0] = '0';
+				return (io_parse_hex_byte(hex, val));
+			}
 			commentaire = false;
+		}
 		if (c == ';' || c == '#')
 			commentaire = true;
 		if (commentaire)
@@ -103,7 +112,7 @@ static void	ajouter_flux_buffer_entree(Mini_ordi *pico, FILE *stream,
 	const char *source) {
 	u8	val;
 
-	while (io_lire_octet_hex(stream, &val)) {
+	while (io_lire_octet_hex(stream, &val, false)) {
 		ajouter_octet_buffer_entree(pico, val, source);
 	}
 	if (ferror(stream)) {

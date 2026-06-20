@@ -108,7 +108,7 @@ void	init_dbg(Dbg *dbg)
 			.courant = {{0}},
 			.initialise = false,
 		},
-		.erreur_prog = 0,
+		.status_proc = PICO_OK,
 	};
 }
 
@@ -120,7 +120,7 @@ void	init_dbg(Dbg *dbg)
 int	main(int ac, char** av) {
 	Mini_ordi 	pico;
 	Dbg			dbg;
-	int			ret = 0;
+	pstatus		status = PICO_OK;
 
 	init_sig();
 	init_pico(&pico);
@@ -132,15 +132,16 @@ int	main(int ac, char** av) {
 	pico.dbg = &dbg;
 
 	charger_microsequences(&pico);
-	while ((ret = coeur(&pico, &dbg))) {
-		if (ret < 3 || !pico.modes.debogage)
+	while ((status = coeur(&pico, &dbg))) {
+		if (status < PICO_ERR_MEMOIRE || !pico.modes.debogage)
 			break;
-		dbg.erreur_prog = ret;
+		if (dbg.status_proc == PICO_OK)
+		dbg.status_proc = status;
 	}
 	dbg_display_leave(&dbg);
-	msg_print_error(&pico, ret);
+	msg_print_error(&pico, status);
 	printf(RST D_WRAP D_SHOW_CURSOR);
-	return (ret);
+	return ((int)status);
 }
 
 /**

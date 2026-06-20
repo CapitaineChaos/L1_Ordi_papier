@@ -53,13 +53,14 @@ Description : Chaînes, couleurs et gabarits de l'interface du débogueur
 # define DBG_STATE_FOND				MODE_CLAIR "                                                                                " RST
 # define DBG_HELP_TEXT				MODE_FONCE "%.*s" RST
 
-# define MSG_ERR_MEMORY_D		FOND_ALERT BLK "  Erreur de mémoire : " BLD "%02X" RST FOND_ALERT BLK " - Arrêt du programme\n " RSTFG
-# define MSG_ERR_INSTRUCTION_D	FOND_ALERT BLK "Instruction inconnue : " BLD "%02X" RST FOND_ALERT BLK " - Arrêt du programme\n" RSTFG
-# define MSG_ERR_CORE_D			FOND_ALERT BLK "    Défaillance du cœur - Arrêt du programme\n    " RSTFG
-# define MSG_ERR_INCONNUE_D		FOND_ALERT BLK " Erreur inconnue : code " BLD "%d" RST FOND_ALERT BLK " - Arrêt du programme\n " RSTFG
+# define MSG_ERR_MEMORY_D		    FOND_ALERT BLK "  Erreur de mémoire : " BLD "%02X" RST FOND_ALERT BLK " - Arrêt du programme\n " RSTFG
+# define MSG_ERR_INSTRUCTION_D	    FOND_ALERT BLK "Instruction inconnue : " BLD "%02X" RST FOND_ALERT BLK " - Arrêt du programme\n" RSTFG
+# define MSG_ERR_CORE_D			    FOND_ALERT BLK "    Défaillance du cœur - Arrêt du programme\n    " RSTFG
+# define MSG_ERR_INCONNUE_D		    FOND_ALERT BLK " Erreur inconnue : code " BLD "%d" RST FOND_ALERT BLK " - Arrêt du programme\n" RSTFG
+# define MSG_ERR_STOP_D			    FOND_ALERT BLK "      Pico à été arrêté par " BLD "STOP"  RST FOND_ALERT BLK  " (" BLD "0xFF"  RST FOND_ALERT BLK  ") !\n" RSTFG
 
-# define DBG_TOP_TITRE			MODE_FONCE BLD "                                   PICO v1.0                                    " RST
-# define DBG_TOP_MENU(i, o)		"%s%s%s%s%s", FOND_FONCE "    Quitter " L_YL "[Q]" RSTFG "       Sortir " L_YL "[S]" RSTFG "       Aide " L_YL "[H]" RSTFG "       Buffers ", (i) ? L_YL : G_04, "[I]" RSTFG "/", (o) ? L_YL : G_04, "[O]" RST
+# define DBG_TOP_TITRE			    MODE_FONCE BLD "                                   PICO v1.0                                    " RST
+# define DBG_TOP_MENU(i, o)		    "%s%s%s%s%s", FOND_FONCE "    Quitter " L_YL "[Q]" RSTFG "       Sortir " L_YL "[S]" RSTFG "       Aide " L_YL "[H]" RSTFG "       Buffers ", (i) ? L_YL : G_04, "[I]" RSTFG "/", (o) ? L_YL : G_04, "[O]" RST
 
 # define DBG_FOND_WH				MODE_CLAIR "                                                                                " RST
 # define DBG_FOND_BK				MODE_FONCE "                                                                                " RST
@@ -90,14 +91,14 @@ Description : Chaînes, couleurs et gabarits de l'interface du débogueur
 # define DBG_AFF_ADR(i)							MODE_FONCE "0x%02X " RST, (i)
 # define DBG_AFF_MEM(i, val, PC, RS, M)			MODE_FONCE " %s%02X%s",  (M == 13 && i == RS) ? RST BGD_GN : ((M == 14 && i == RS) ? RST BGD_RD : (i == PC ? RST BG_CN B_BK : "")), val, RST
 
-# define DBG_MICROCODE(fg, m)	MODE_FONCE " %s%d%s", (fg) == true ? BG_YL B_BK BLD : "" , m, RST
-# define DBG_PHASE(f)			BGG_06 G_00 "Phase " BLD "%d" RST, (f)
-# define DBG_MICROCODE_P(mp)	MODE_FONCE "Microcode précédent : " BG_MG BLD "%d" RST, (mp)
-# define DBG_MICROCODE_S(mp)	MODE_FONCE "%s            │ suivants :" RST, (mp) < 10 ? " " : ""
-# define DBG_LMICROCODE(m, s)	MODE_FONCE "Microcode à venir   : " BLD "%-2d" RSTFG "            │  %s\n" RST, m, s
-# define DBG_LINSTRUCTION(i)	MODE_FONCE "Instruction à venir : " "%s" RST, INS
-# define DBG_CMD_LIST			MODE_FONCE "Commandes : " L_BL "ENTER" RSTFG " " L_BL "*" RSTFG " " L_BL "**" RSTFG " " L_BL "+" RSTFG " " L_BL "++" RSTFG " " L_BL "-" RSTFG " " L_BL "--" RSTFG " " L_BL "m" RSTFG " " L_BL "j" RST
-# define DBG_INVITE(err)		MODE_FONCE "%s$" RSTFG " ", (err) ? B_RD : ""
+# define DBG_MICROCODE(fg, m)	        MODE_FONCE " %s%d%s", (fg) == true ? BG_YL B_BK BLD : "" , m, RST
+# define DBG_PHASE(f)			        BGG_06 G_00 "Phase " BLD "%d" RST, (f)
+# define DBG_MICROCODE_P(mp)	        MODE_FONCE "Microcode précédent : " BG_MG BLD "%d" RST, (mp)
+# define DBG_MICROCODE_S(mp)	        MODE_FONCE "%s            │ suivants :" RST, (mp) < 10 ? " " : ""
+# define DBG_LMICROCODE(m, s)	        MODE_FONCE "Microcode à venir   : " BLD "%-2d" RSTFG "            │  %s\n" RST, m, s
+# define DBG_LINSTRUCTION(i)	        MODE_FONCE "Instruction à venir : " "%s" RST, INS
+# define DBG_CMD_LIST			        MODE_FONCE "Commandes : " L_BL "ENTER" RSTFG " " L_BL "*" RSTFG " " L_BL "**" RSTFG " " L_BL "+" RSTFG " " L_BL "++" RSTFG " " L_BL "-" RSTFG " " L_BL "--" RSTFG " " L_BL "m" RSTFG " " L_BL "j" RST
+# define DBG_INVITE(err)		        MODE_FONCE "%s$" RSTFG " ", (err) ? B_RD : ""
 
 # define MSG_STDIN_RESTANT(len, pos)	MODE_CLAIR "Buffer stdin restant : %zu octets" RST, (len) - (pos)
 # define MSG_STDIN_ASC 					MODE_CLAIR "ASCII" RST

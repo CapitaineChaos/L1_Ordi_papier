@@ -19,6 +19,6 @@ Description : Déclarations du parser de commandes debug
 # include <stdbool.h>
 
 dbg_cmd	attente_commande(Mini_ordi *pico, Dbg *dbg, bool err);
-void	vider_etat_temporaire(Dbg *dbg, bool err);
+void	vider_etat_temporaire(Dbg *dbg);
 
 #endif

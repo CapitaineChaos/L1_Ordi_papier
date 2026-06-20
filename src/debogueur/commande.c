@@ -28,13 +28,9 @@ Description : Lecture et interprétation des commandes debug
 /**
  * @brief Vide l'état temporaire du débogueur
  * @param dbg Le débogueur
- * @param err Indique si une erreur s'est produite
  */
-void	vider_etat_temporaire(Dbg *dbg, bool err) {
+void	vider_etat_temporaire(Dbg *dbg) {
 	dbg->texte.lg_status[0] = '\0';
-	if (!err)
-		dbg->erreur_prog = 0;
-	(void)err;
 	render_set_line(dbg, DBG_STATE_LINE, DBG_STATE_FOND);
 }
 
@@ -95,6 +91,8 @@ static dbg_cmd	lire_ligne_commande(Mini_ordi *pico, Dbg *dbg, bool err, char *st
 			break;
 		if (len == 0) {
 			dbg_cmd	direct = dbg_key_directe(pico, c);
+			if (direct == DBG_CMD_UNAVAILABLE)
+				continue;
 			if (direct != DBG_CMD_NONE) {
 				dbg_input_fin(dbg);
 				return (direct);
@@ -114,7 +112,7 @@ static dbg_cmd	lire_ligne_commande(Mini_ordi *pico, Dbg *dbg, bool err, char *st
 		}
 	}
 	dbg_input_fin(dbg);
-	vider_etat_temporaire(dbg, err);
+	vider_etat_temporaire(dbg);
 	return (DBG_CMD_NONE);
 }
 
@@ -132,10 +130,17 @@ dbg_cmd	attente_commande(Mini_ordi *pico, Dbg *dbg, bool err) {
 	}
 	if (ret == DBG_CMD_SHOW_HELP || ret == DBG_CMD_SHOW_INPUT || ret == DBG_CMD_SHOW_OUTPUT)
 		return (attendre_menu(pico, dbg, ret));
+
+	// On empêche la continuation du programme si le processeur est en erreur
+	if(dbg->status_proc > PICO_ERR_MEMOIRE)
+		return (DBG_CMD_NONE);
+
 	if (ret != DBG_CMD_NONE)
 		return (ret);
+
 	if (str[0] == '\0' || str[0] == '\n')
 		return (DBG_CMD_AUTO);
+
 	fprintf(tty, RST);
 	ret = parser_commande(pico, dbg, str);
 	if (ret == DBG_CMD_QUIT) {

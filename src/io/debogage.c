@@ -32,8 +32,6 @@ static void	afficher_invite_debug_entree(Mini_ordi *pico, const char *hex) {
 	if (!compositeur_overlay_ok(dbg))
 		return;
 	compositeur_invite_entree(pico, dbg, hex);
-	// Le viewer différentiel gère aussi le retour depuis l'état « trop petit »
-	// (init_screen réinitialise le buffer précédent et force un redessin complet)
 	dbg_display_draw(dbg);
 }
 
@@ -72,7 +70,7 @@ static u8	lire_entree_debug_utilisateur(Mini_ordi *pico) {
 		// Backspace pour effacer le dernier chiffre entré
 		if (c == DBG_KEY_BACKSPACE) {
 			if (len > 0) {
-				hex[len--] = '\0';
+				hex[--len] = '\0';
 				afficher_invite_debug_entree(pico, hex);
 			}
 			continue;

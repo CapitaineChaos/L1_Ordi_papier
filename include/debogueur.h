@@ -46,6 +46,7 @@ enum dbg_default_e {
 
 enum dbg_command_e {
 	DBG_CMD_NONE,
+	DBG_CMD_UNAVAILABLE,
 	DBG_CMD_NEXT_MICROCODE,
 	DBG_CMD_NEXT_PHASE,
 	DBG_CMD_NEXT_INSTRUCTION,
@@ -104,7 +105,7 @@ struct	s_dbg {
 	Dbg_text		texte;
 	Dbg_terminal	terminal;
 	Dbg_screen		screen;
-	int				erreur_prog;
+	pstatus			status_proc;
 };
 
 

@@ -20,13 +20,12 @@ la sémantique des microcodes/instructions dans debogueur/semantique.h.
 
 # include "ansi.h"
 # include "pico_types.h"
-
 # include <stdbool.h>
 # include <stddef.h>
 
 void	msg_print_signal(int sig);
 void	msg_print_usage(const char *nom);
-void	msg_print_error(Mini_ordi *pico, int code);
+void	msg_print_error(Mini_ordi *pico, pstatus status);
 void	msg_print_debug_help(void);
 void	msg_print_input_prompt(Modes *modes);
 void	msg_perror_tty(void);

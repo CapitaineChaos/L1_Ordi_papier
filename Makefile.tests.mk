@@ -17,12 +17,12 @@
 .ONESHELL:
 .SHELLFLAGS := -ec
 
-.PHONY: t1 t2 t3 t4 t5 t6 t7 t8
+.PHONY: t1 t2 t3 t4 t5 t6 t7 t8 t9
 
 # Tests
 t1: $(TARGET)
 	@printf "${BOLD}%s${RESET} : ${B_GN}%s${RESET}\n" "Exécution du test 1 / standard input"
-	@$(TARGET) < exemples/simple.hex
+	@$(TARGET) < exemples/simple.hex  | xxd -r -ps; echo
 
 t2: $(TARGET)
 	@printf "${BOLD}%s${RESET} : ${B_GN}%s${RESET}\n" "Exécution du test 2, option -b / standard input"
@@ -104,3 +104,8 @@ t7: $(TARGET)
 t8: $(TARGET)
 	@printf "${BOLD}%s${RESET} : ${B_GN}%s${RESET}\n" "Exécution du test 8, option -df / fichier d'entrée"
 	@$(TARGET) -df exemples/simple.hex
+
+t9: $(TARGET)
+	@printf "${BOLD}%s${RESET} : ${B_GN}%s${RESET}\n" "Exécution du test 9, option -d / pipe d'entrée"
+	@cat exemples/simple.hex | $(TARGET) -d
+
