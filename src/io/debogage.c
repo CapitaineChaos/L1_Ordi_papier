@@ -38,61 +38,81 @@ static void	afficher_invite_debug_entree(Mini_ordi *pico, const char *hex) {
 
 
 /**
- * @brief Lit une entrée hexadécimale de l'utilisateur en mode débogueur
+ * @brief Indique si un caractère est un chiffre valide selon le mode de saisie
+ * @param c Le caractère
+ * @param hexa true si la saisie est hexadécimale, false si décimale
+ * @return true si le caractère est accepté
+ */
+static bool	chiffre_valide(int c, bool hexa) {
+	return (hexa ? isxdigit(c) : isdigit(c));
+}
+
+/**
+ * @brief Lit une entrée saisie au clavier en mode débogueur
  * @param pico Le mini-ordinateur
- * @return L'octet hexadécimal lu
+ * @return L'octet lu (saisie décimale par défaut, hexadécimale si -x)
  */
 static u8	lire_entree_debug_utilisateur(Mini_ordi *pico) {
 	Dbg		*dbg = pico->dbg;
+	bool	hexa = pico->modes.mode_hexa;
+	size_t	max = hexa ? 2 : 3;
 	FILE	*stream;
-	char	hex[3];
+	char	saisie[4];
 	size_t	len;
 	int		c;
-	u8		val;
+	u8		val = 0;
 
 	if (!dbg_get_tty(dbg))
 		return (0);
 	stream = io_flux_entree_utilisateur(pico);
-	hex[0] = '\0';
-	hex[1] = '\0';
-	hex[2] = '\0';
+	saisie[0] = '\0';
 	len = 0;
 	dbg_input_debut(dbg);
-	afficher_invite_debug_entree(pico, hex);
+	afficher_invite_debug_entree(pico, saisie);
 	while (true) {
 		c = dbg_input_touche(dbg, stream);
 		if (c == DBG_KEY_EOF)
 			break;
 		if (c == DBG_KEY_RESIZE) {
-			afficher_invite_debug_entree(pico, hex);
+			afficher_invite_debug_entree(pico, saisie);
 			continue;
 		}
 		// Backspace pour effacer le dernier chiffre entré
 		if (c == DBG_KEY_BACKSPACE) {
 			if (len > 0) {
-				hex[--len] = '\0';
-				afficher_invite_debug_entree(pico, hex);
+				saisie[--len] = '\0';
+				afficher_invite_debug_entree(pico, saisie);
 			}
 			continue;
 		}
 		// Entrée valide (au moins un chiffre saisi) pour construire l'octet
 		if (c == DBG_KEY_ENTER) {
-			if (len > 0) {
+			if (len == 0)
+				continue;
+			if (hexa) {
 				if (len == 1) {
-					hex[1] = hex[0];
-					hex[0] = '0';
+					saisie[1] = saisie[0];
+					saisie[0] = '0';
+					saisie[2] = '\0';
 				}
 				break;
 			}
+			// En décimal, on refuse une valeur dépassant 255
+			if (io_parse_dec_byte(saisie, &val))
+				break;
 			continue;
 		}
-		if (isxdigit(c) && len < 2) {
-			hex[len++] = (char)toupper(c);
-			afficher_invite_debug_entree(pico, hex);
+		if (chiffre_valide(c, hexa) && len < max) {
+			saisie[len++] = hexa ? (char)toupper(c) : (char)c;
+			saisie[len] = '\0';
+			afficher_invite_debug_entree(pico, saisie);
 		}
 	}
 	dbg_input_fin(dbg);
-	io_parse_hex_byte(hex, &val);
+	if (hexa)
+		io_parse_hex_byte(saisie, &val);
+	else
+		io_parse_dec_byte(saisie, &val);
 	return (val);
 }
 

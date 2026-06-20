@@ -48,6 +48,8 @@ Description : Chaînes, couleurs et gabarits de l'interface du débogueur
 
 # define DBG_STATE_EXEC_MICRO		MODE_CLAIR "Execution du microcode %02d" RST
 # define DBG_STATE_JUMP				MODE_CLAIR "PC placé à l'adresse " BLD "%02X" RST
+# define DBG_STATE_SAISIE_HEXA		MODE_CLAIR "Saisie clavier en " BLD "hexadécimal" RST
+# define DBG_STATE_SAISIE_DEC		MODE_CLAIR "Saisie clavier en " BLD "décimal" RST
 # define DBG_STATE_UNKNOWN_CMD		MODE_CLAIR "Commande inconnue" RST
 # define DBG_STATE_SMALL_TERM		"Affichage du debogueur indisponible :\n Agrandir pour atteindre le terminal minimum 80x27."
 # define DBG_STATE_FOND				MODE_CLAIR "                                                                                " RST
@@ -97,7 +99,7 @@ Description : Chaînes, couleurs et gabarits de l'interface du débogueur
 # define DBG_MICROCODE_S(mp)	        MODE_FONCE "%s            │ suivants :" RST, (mp) < 10 ? " " : ""
 # define DBG_LMICROCODE(m, s)	        MODE_FONCE "Microcode à venir   : " BLD "%-2d" RSTFG "            │  %s\n" RST, m, s
 # define DBG_LINSTRUCTION(i)	        MODE_FONCE "Instruction à venir : " "%s" RST, INS
-# define DBG_CMD_LIST			        MODE_FONCE "Commandes : " L_BL "ENTER" RSTFG " " L_BL "*" RSTFG " " L_BL "**" RSTFG " " L_BL "+" RSTFG " " L_BL "++" RSTFG " " L_BL "-" RSTFG " " L_BL "--" RSTFG " " L_BL "m" RSTFG " " L_BL "j" RST
+# define DBG_CMD_LIST			        MODE_FONCE "Commandes : " L_BL "ENTER" RSTFG " " L_BL "*" RSTFG " " L_BL "**" RSTFG " " L_BL "+" RSTFG " " L_BL "++" RSTFG " " L_BL "-" RSTFG " " L_BL "--" RSTFG " " L_BL "m" RSTFG " " L_BL "j" RSTFG " " L_BL "x" RSTFG " " L_BL "d" RST
 # define DBG_INVITE(err)		        MODE_FONCE "%s$" RSTFG " ", (err) ? B_RD : ""
 
 # define MSG_STDIN_RESTANT(len, pos)	MODE_CLAIR "Buffer stdin restant : %zu octets" RST, (len) - (pos)

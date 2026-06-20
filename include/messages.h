@@ -30,6 +30,7 @@ void	msg_print_debug_help(void);
 void	msg_print_input_prompt(Modes *modes);
 void	msg_perror_tty(void);
 void	msg_print_hex(int val);
+void	msg_print_dec(int val);
 
 
 # define MSG_CMDS "\n" \
@@ -42,7 +43,9 @@ void	msg_print_hex(int val);
 	"     -            : Passer au microcode suivant\n" \
 	"     --           : step = microcode\n" \
 	"     m NN         : (m, mc) exécuter le microcode NN\n" \
-	"     j NN         : (j, jump) placer PC à l'adresse NN  / 0xNN\n\n" \
+	"     j NN         : (j, jump) placer PC à l'adresse NN  / 0xNN\n" \
+	"     x            : saisie clavier en hexadécimal\n" \
+	"     d            : saisie clavier en décimal\n\n" \
 	"  Menus :\n\n" \
 	"    i / in       : afficher le buffer input\n" \
 	"    o / out      : afficher le buffer output\n" \
@@ -62,6 +65,7 @@ void	msg_print_hex(int val);
 	"  -f, --file HEX    Ajouter un fichier .hex au buffer d'entrée\n" \
 	"  -a, --adresse N   Adresse de début du programme (-t requis)\n" \
 	"  -t, --taille N    Taille du programme (-a requis)\n" \
+	"  -x, --hexa        Saisie clavier en hexadécimal (défaut : décimal)\n" \
 	"\n" \
 	"Exemples :\n" \
 	"  %s < programme.hex         (mode classique)\n" \
@@ -70,6 +74,8 @@ void	msg_print_hex(int val);
 
 # define MSG_INPUT_BOOTSTRAP		"Le bootstrap demande la saisie de 2 symboles hexa :"
 # define MSG_INPUT_PROGRAM			"Le programme demande la saisie de 2 symboles hexa :"
+# define MSG_INPUT_BOOTSTRAP_DEC	"Le bootstrap demande la saisie d'un nombre décimal entre 0 et 255 :"
+# define MSG_INPUT_PROGRAM_DEC		"Le programme demande la saisie d'un nombre décimal entre 0 et 255 :"
 
 // Glyphes de l'opération UAL (écrits par le cœur, affichés par le débogueur)
 # define DBG_UAL_NAND			"⊼"

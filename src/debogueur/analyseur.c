@@ -104,6 +104,29 @@ static bool	is_def_change_cmd(Dbg *dbg, const char *cmd) {
 }
 
 /**
+ * @brief Parse une commande de bascule du mode de saisie clavier (hexa / décimal)
+ * @param pico Le mini-ordinateur
+ * @param dbg Le débogueur
+ * @param cmd La chaîne de caractères contenant la commande
+ * @return true si la commande a été reconnue, false sinon
+ */
+static bool	is_saisie_mode_cmd(Mini_ordi *pico, Dbg *dbg, const char *cmd) {
+	if (!strcasecmp(cmd, "x")) {
+		pico->modes.mode_hexa = true;
+		render_set_text(dbg->texte.lg_status, sizeof(dbg->texte.lg_status),
+			DBG_STATE_SAISIE_HEXA);
+		return (true);
+	}
+	if (!strcasecmp(cmd, "d")) {
+		pico->modes.mode_hexa = false;
+		render_set_text(dbg->texte.lg_status, sizeof(dbg->texte.lg_status),
+			DBG_STATE_SAISIE_DEC);
+		return (true);
+	}
+	return (false);
+}
+
+/**
  * @brief Parse une commande de microcode saisie par l'utilisateur dans le débogueur
  * @param dbg Le débogueur
  * @param str La chaîne de caractères contenant la commande
@@ -178,6 +201,8 @@ dbg_cmd	parser_commande(Mini_ordi *pico, Dbg *dbg, const char *str) {
 		return (DBG_CMD_NEXT_MICROCODE);
 	if (is_stop_dbg_cmd(cmd))
 		return (DBG_CMD_STOP_DBG);
+	if (is_saisie_mode_cmd(pico, dbg, cmd))
+		return (DBG_CMD_NONE);
 	if (is_def_change_cmd(dbg, cmd))
 		return (DBG_CMD_NONE);
 	if (is_help_cmd(cmd))

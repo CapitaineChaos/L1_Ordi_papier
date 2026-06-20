@@ -20,7 +20,9 @@ Description : Fonctions internes partagées des entrées/sorties
 # include <stdio.h>
 
 bool	io_lire_octet_hex(FILE *stream, u8 *val, bool clavier);
+bool	io_lire_octet_dec(FILE *stream, u8 *val);
 bool	io_parse_hex_byte(const char *hex, u8 *val);
+bool	io_parse_dec_byte(const char *dec, u8 *val);
 FILE	*io_flux_entree_utilisateur(Mini_ordi *pico);
 u8		io_lire_entree_debug(Mini_ordi *pico);
 

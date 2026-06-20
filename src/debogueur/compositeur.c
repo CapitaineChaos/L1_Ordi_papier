@@ -133,9 +133,11 @@ void	compositeur_attente(Mini_ordi *pico, Dbg *dbg, bool err, const char *str) {
 void	compositeur_invite_entree(Mini_ordi *pico, Dbg *dbg, const char *hex) {
 	render_set_line(dbg, DBG_PROMPT_LINE, LG_COLOR(FOND_FONCE, B_WH));
 	if (pico->PC < 32)
-		render_lg_col(dbg, DBG_PROMPT_LINE, 1, MODE_FONCE BLD MSG_INPUT_BOOTSTRAP RST);
+		render_lg_col(dbg, DBG_PROMPT_LINE, 1, MODE_FONCE BLD "%s" RST,
+			pico->modes.mode_hexa ? MSG_INPUT_BOOTSTRAP : MSG_INPUT_BOOTSTRAP_DEC);
 	else
-		render_lg_col(dbg, DBG_PROMPT_LINE, 1, MODE_FONCE BLD MSG_INPUT_PROGRAM RST);
+		render_lg_col(dbg, DBG_PROMPT_LINE, 1, MODE_FONCE BLD "%s" RST,
+			pico->modes.mode_hexa ? MSG_INPUT_PROGRAM : MSG_INPUT_PROGRAM_DEC);
 	render_set_line(dbg, DBG_COMMAND_LINE, DBG_FOND_BK);
 	render_lg_col(dbg, DBG_COMMAND_LINE, 1, DBG_INVITE(false));
 	render_append_to_line(dbg, DBG_COMMAND_LINE, "%s", hex);

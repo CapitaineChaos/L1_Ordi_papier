@@ -9,6 +9,17 @@ Lors de l'utilisation de toutes les données d'entrée, les priorités sont les 
 3. L'option -f
 
 
+## Mode décimal / hexadécimal
+
+Par défaut les entrées clavier sont en décimal. La lecture dans les fichiers ou en entrée standard sont uniquement en hexadécimal.
+
+Possibilité de changer le type de saisie en mode direct avec :
+1. -x pour hexa
+Ou en mode debogueur avec les raccourcis :
+1. x
+2. d
+La sortie est en décimal par défaut en mode standard. En débogage la sortie est hexadécimale.
+
 ## Utilisation
 
 ### Chaîne de caractères

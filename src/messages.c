@@ -69,9 +69,9 @@ void	msg_print_input_prompt(Modes *modes) {
 	if (!modes->verbeux)
 		return;
 	if (modes->bootstrap)
-		printf(MSG_INPUT_BOOTSTRAP);
+		printf(modes->mode_hexa ? MSG_INPUT_BOOTSTRAP : MSG_INPUT_BOOTSTRAP_DEC);
 	else
-		printf(MSG_INPUT_PROGRAM);
+		printf(modes->mode_hexa ? MSG_INPUT_PROGRAM : MSG_INPUT_PROGRAM_DEC);
 	printf(RST " $ ");
 }
 
@@ -81,4 +81,8 @@ void	msg_perror_tty(void) {
 
 void	msg_print_hex(int val) {
 	printf("%02X\n", val);
+}
+
+void	msg_print_dec(int val) {
+	printf("%d\n", val);
 }

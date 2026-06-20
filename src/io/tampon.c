@@ -40,6 +40,48 @@ bool	io_parse_hex_byte(const char *hex, u8 *val) {
 }
 
 /**
+ * @brief Convertit une chaîne décimale en octet
+ * @param dec La chaîne décimale (1 à 3 chiffres)
+ * @param val Pointeur vers l'octet résultant
+ * @return true si la conversion a réussi et tient sur 8 bits, false sinon
+ */
+bool	io_parse_dec_byte(const char *dec, u8 *val) {
+	unsigned long	nb;
+	char			*fin;
+
+	if (!dec || !val || !isdigit((unsigned char)dec[0]))
+		return (false);
+	nb = strtoul(dec, &fin, 10);
+	if (*fin != '\0' || nb > 255)
+		return (false);
+	*val = (u8)nb;
+	return (true);
+}
+
+/**
+ * @brief Lit un octet décimal saisi au clavier (terminé par Entrée)
+ * @param stream Le flux d'entrée
+ * @param val Pointeur vers l'octet résultant
+ * @return true si la lecture a réussi, false sinon
+ * @note Seule la saisie clavier utilise le décimal ; le stdin reste hexa.
+ */
+bool	io_lire_octet_dec(FILE *stream, u8 *val) {
+	char	dec[4];
+	int		i;
+	int		c;
+
+	i = 0;
+	while ((c = fgetc(stream)) != EOF && c != '\n') {
+		if (isdigit(c) && i < 3)
+			dec[i++] = (char)c;
+	}
+	dec[i] = '\0';
+	if (c == EOF && i == 0)
+		return (false);
+	return (io_parse_dec_byte(dec, val));
+}
+
+/**
  * @brief Lit un octet hexadécimal à partir d'un flux
  * @param stream Le flux d'entrée
  * @param val Pointeur vers l'octet résultant

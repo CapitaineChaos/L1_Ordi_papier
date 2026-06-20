@@ -34,7 +34,11 @@ void	afficher_sortie(Mini_ordi *pico, u8 val) {
 	// Préciser l'affichage pour le mode verbeux si activé
 	if (pico->modes.verbeux)
 		printf("\nSortie : ");
-	msg_print_hex(val);
+	// La sortie suit le mode : hexadécimal si -x, décimal par défaut
+	if (pico->modes.mode_hexa)
+		msg_print_hex(val);
+	else
+		msg_print_dec(val);
 }
 
 /**
@@ -57,9 +61,15 @@ static u8	lire_entree_classique(Mini_ordi *pico, u8 PC) {
 	}
 	msg_print_input_prompt(&pico->modes);
 	stream = io_flux_entree_utilisateur(pico);
-	// Ici l'entrée devrait se fait au clavier
-	while (!io_lire_octet_hex(stream, &val, true))
-		continue;
+	// Ici l'entrée se fait au clavier : décimal par défaut, hexa si -x
+	if (pico->modes.mode_hexa) {
+		while (!io_lire_octet_hex(stream, &val, true))
+			continue;
+	}
+	else {
+		while (!io_lire_octet_dec(stream, &val))
+			continue;
+	}
 	return (val);
 }
 
