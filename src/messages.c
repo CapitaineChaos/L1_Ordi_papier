@@ -79,10 +79,3 @@ void	msg_perror_tty(void) {
 	fprintf(stderr, MSG_ERR_TTY);
 }
 
-void	msg_print_hex(int val) {
-	printf("%02X\n", val);
-}
-
-void	msg_print_dec(int val) {
-	printf("%d\n", val);
-}

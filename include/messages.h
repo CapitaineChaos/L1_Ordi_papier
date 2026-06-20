@@ -29,8 +29,6 @@ void	msg_print_error(Mini_ordi *pico, pstatus status);
 void	msg_print_debug_help(void);
 void	msg_print_input_prompt(Modes *modes);
 void	msg_perror_tty(void);
-void	msg_print_hex(int val);
-void	msg_print_dec(int val);
 
 
 # define MSG_CMDS "\n" \
@@ -66,6 +64,8 @@ void	msg_print_dec(int val);
 	"  -a, --adresse N   Adresse de début du programme (-t requis)\n" \
 	"  -t, --taille N    Taille du programme (-a requis)\n" \
 	"  -x, --hexa        Saisie clavier en hexadécimal (défaut : décimal)\n" \
+	"  -n, --no-newline  Sorties sans saut de ligne (un seul à la fin)\n" \
+	"  -p, --ascii       Sortie en ASCII, imprimables seulement (prime sur -x)\n" \
 	"\n" \
 	"Exemples :\n" \
 	"  %s < programme.hex         (mode classique)\n" \

@@ -64,6 +64,8 @@ void	init_pico(Mini_ordi *pico) {
 			.debogage = false,
 			.verbeux = false,
 			.mode_hexa = false,
+			.sans_saut_ligne = false,
+			.mode_ascii = false,
 		},
 		.prog_debut = 0,
 		.prog_taille = 0,
@@ -140,6 +142,9 @@ int	main(int ac, char** av) {
 		dbg.status_proc = status;
 	}
 	dbg_display_leave(&dbg);
+	// En mode -n les sorties sont collées : on termine la ligne une seule fois
+	if (!pico.modes.debogage && pico.modes.sans_saut_ligne && pico.IO.output_len > 0)
+		printf("\n");
 	msg_print_error(&pico, status);
 	return ((int)status);
 }
@@ -187,13 +192,15 @@ void	options(int ac, char** av, Mini_ordi *pico) {
 		{"taille", required_argument, NULL, 't'},
 		{"verbose", no_argument, NULL, 'v'},
 		{"hexa", no_argument, NULL, 'x'},
+		{"no-newline", no_argument, NULL, 'n'},
+		{"ascii", no_argument, NULL, 'p'},
 		{0, 0, 0, 0},
 	};
 	int						opt;
 	bool					adresse_fournie = false;
 	bool					taille_fournie = false;
 
-	while ((opt = getopt_long(ac, av, "a:dbhf:t:vx", long_options, NULL)) != -1) {
+	while ((opt = getopt_long(ac, av, "a:dbhf:t:vxnp", long_options, NULL)) != -1) {
 		switch (opt) {
 			case 'h':	afficher_utilisation(av[0], EXIT_SUCCESS); break;
 			case 'a':	pico->prog_debut = option_u8(MSG_OPT_ADRESSE, optarg); adresse_fournie = true; break;
@@ -203,6 +210,8 @@ void	options(int ac, char** av, Mini_ordi *pico) {
 			case 't':	pico->prog_taille = option_u8(MSG_OPT_TAILLE, optarg); taille_fournie = true; break;
 			case 'v':	pico->modes.verbeux = true; break;
 			case 'x':	pico->modes.mode_hexa = true; break;
+			case 'n':	pico->modes.sans_saut_ligne = true; break;
+			case 'p':	pico->modes.mode_ascii = true; break;
 			default: exit (EXIT_FAILURE);
 		}
 	}

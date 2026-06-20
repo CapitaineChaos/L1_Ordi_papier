@@ -73,9 +73,12 @@ struct	s_modes {
 	bool	bootstrap;
 	/** Mode verbeux */
 	bool	verbeux;
-	/** Représentation hexadécimale de la saisie clavier et de la sortie
-	 *  non-debug (sinon décimal par défaut) */
+	/** Mode hexa du clavier et de la sortie non-debug, sinon décimal par défaut */
 	bool	mode_hexa;
+	/** Sortie non-debug sans saut de ligne entre les valeurs, seulement à la fin */
+	bool	sans_saut_ligne;
+	/** Sortie non-debug en ASCII imprimables uniquement; prime sur mode_hexa */
+	bool	mode_ascii;
 };
 
 typedef bool	(*t_condition)(Mini_ordi *pico);

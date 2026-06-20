@@ -16,6 +16,7 @@ Description : Fonctions d'entrées/sorties du mini-ordinateur
 #include "io.h"
 #include "messages.h"
 #include "pico.h"
+#include <ctype.h>
 #include <stdio.h>
 
 /**
@@ -31,14 +32,22 @@ void	afficher_sortie(Mini_ordi *pico, u8 val) {
 		pico->IO.output[pico->IO.output_len++] = (char)val;
 	if (pico->modes.debogage)
 		return;
+	// Mode ASCII (-p) : on n'affiche que les caractères imprimables, le reste est ignoré
+	if (pico->modes.mode_ascii && !isprint(val))
+		return;
 	// Préciser l'affichage pour le mode verbeux si activé
 	if (pico->modes.verbeux)
 		printf("\nSortie : ");
-	// La sortie suit le mode : hexadécimal si -x, décimal par défaut
-	if (pico->modes.mode_hexa)
-		msg_print_hex(val);
+	// L'ASCII (-p) prime ; sinon hexadécimal si -x, décimal par défaut
+	if (pico->modes.mode_ascii)
+		printf("%c", val);
+	else if (pico->modes.mode_hexa)
+		printf("%02X", val);
 	else
-		msg_print_dec(val);
+		printf("%d", val);
+	// Saut de ligne entre les sorties, sauf en mode -n (un seul à la fin)
+	if (!pico->modes.sans_saut_ligne)
+		printf("\n");
 }
 
 /**
@@ -56,7 +65,7 @@ static u8	lire_entree_classique(Mini_ordi *pico, u8 PC) {
 	if (IO_STDIN_AVAILABLE) {
 		val = (unsigned char)pico->IO.buffer[pico->IO.buffer_pos++];
 		if (pico->modes.verbeux)
-			printf("buffer stdin -> %02X\n", val);
+			printf("buffer stdin -> %02X", val);
 		return (val);
 	}
 	msg_print_input_prompt(&pico->modes);

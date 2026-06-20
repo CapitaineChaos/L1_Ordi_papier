@@ -14,11 +14,16 @@ Lors de l'utilisation de toutes les données d'entrée, les priorités sont les 
 Par défaut les entrées clavier sont en décimal. La lecture dans les fichiers ou en entrée standard sont uniquement en hexadécimal.
 
 Possibilité de changer le type de saisie en mode direct avec :
-1. -x pour hexa
+- option -x pour hexa
 Ou en mode debogueur avec les raccourcis :
-1. x
-2. d
-La sortie est en décimal par défaut en mode standard. En débogage la sortie est hexadécimale.
+- commande x pour passer en hexadécimal
+- commande d pour passer en décimal
+La sortie est en décimal par défaut en mode standard et suit le mode d'entrée. En débogage la sortie est hexadécimale.
+
+## Autres options
+
+1. -n : pas de de retour entre les lignes
+2. -p : conversion ASCII des caracteres imprimables en sortie
 
 ## Utilisation
 
@@ -73,6 +78,11 @@ EOF
 ```bash
 bash
 bin/pico <<< "801F004848704170006548704170006C48704170006C48704170006F48704170FF" | xxd -r -ps; echo;
+```
+
+```bash
+bash
+bin/pico <<< "801F004848704170006548704170006C48704170006C48704170006F48704170FF" -n -p
 ```
 
 ### Fichier en argument
