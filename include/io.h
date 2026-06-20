@@ -1,6 +1,6 @@
 /*==============/                    cx25.1                    \================
 =~~~~~~~~~~~~~=|              Ordinateur en papier              |=~~~~~~~~~~~~~=
-================\             Header entrées/sorties            /================
+================\            Header entrées/sorties            /================
 
 Auteur : Sylvain Maitre     24002886
 

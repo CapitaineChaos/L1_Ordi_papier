@@ -5,7 +5,7 @@
 Auteur : Sylvain Maitre     24002886
 
 Date de création :              13/06/2026
-Date de dernière modification : 13/06/2026
+Date de dernière modification : 20/06/2026
 
 Fichier     : pico_types.h
 Description : Déclarations anticipées des types principaux
@@ -22,5 +22,12 @@ typedef int8_t					s8;
 typedef struct s_mini_ordi		Mini_ordi;
 typedef struct s_modes			Modes;
 typedef struct s_dbg			Dbg;
+
+/* Codes d'erreur renvoyés par le cœur et affichés par le programme */
+enum	pico_erreur {
+	PICO_ERR_MEMOIRE		= 3,
+	PICO_ERR_INSTRUCTION	= 4,
+	PICO_ERR_COEUR			= 5,
+};
 
 #endif

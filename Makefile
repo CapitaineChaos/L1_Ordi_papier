@@ -5,7 +5,7 @@
 # Auteur : Sylvain Maitre     24002886
 #
 # Date de création :              01/10/2025
-# Date de dernière modification : 05/10/2025
+# Date de dernière modification : 20/06/2026
 #
 # Description : Makefile standard pour le projet cx25.1
 # Utilisation : make [cible]
@@ -16,20 +16,22 @@
 
 NAME = pico
 
-include Makefile.config
+include Makefile.config.mk
 
 # Fichiers
-TARGET = $(BINDIR)/$(NAME)
+TARGET  = $(BINDIR)/$(NAME)
 SOURCES = $(shell find $(SRCDIR) -name '*.c')
 OBJECTS = $(SOURCES:$(SRCDIR)/%.c=$(BUILDDIR)/%.o)
 DEPENDS = $(OBJECTS:.o=.d)
 
-.PHONY: all $(NAME) clean distclean help re usage
+.PHONY: all $(NAME) clean distclean help re usage help
+
+include Makefile.tests.mk
 
 # Règle par défaut
 all: $(TARGET)
 
-# Règle pour l'exécutable principal (alias)
+# Exécutable principal (alias)
 $(NAME): all
 
 # Créer le ou les dossiers nécessaires
@@ -37,14 +39,14 @@ $(BUILDDIR) $(BINDIR):
 	@mkdir -p $@
 	@printf "${BOLD}%s${RESET} : ${B_BL}%s${RESET}\n" "Création du dossier" "$(notdir $@)"
 
-# Règle pour l'exécutable principal (linkage)
+# Exécutable principal (linkage)
 # Relink si des fichiers objets ont changé
 # Dépendance simple sans relink si dossier bin manquant
 $(TARGET): $(OBJECTS) | $(BINDIR)
 	@printf "${BOLD}%s${RESET} : ${BPINK}%s${RESET}\n" "Édition des liens pour l'exécutable" "$(notdir $@)"
 	@$(CC) -o $@ $(LDFLAGS) $(OBJECTS) $(LDLIBS)
 
-# Règle pour les fichiers objets du code source (compilation)
+# Fichiers objets du code source (compilation)
 # Recompilation si un fichier source a changé
 # Dépendance simple sans recompilation si dossier build manquant
 $(BUILDDIR)/%.o: $(SRCDIR)/%.c | $(BUILDDIR)
@@ -52,20 +54,20 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.c | $(BUILDDIR)
 	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) $(INC) -c -o $@ $<
 
-# Règle pour le nettoyage des fichiers générés
+# Nettoyage des fichiers générés
 # Pas de suppression des dossiers build et bin
 clean:
 	@printf "${BOLD}%s${RESET} : ${B_YL}%s${RESET}\n" "Nettoyage en cours" "fichiers objets et dépendances..."
 	@rm -rf $(BUILDDIR)/*
 
-# Règle pour un nettoyage complet (distclean)
+# Nettoyage complet (distclean)
 # Suppression des dossiers build et bin
 distclean: clean
 	@printf "${BOLD}%s${RESET} : ${B_RD}%s${RESET}\n" "Nettoyage en cours" "environnement..."
 	@rm -rf $(BINDIR)
 	@rm -rf $(BUILDDIR)
 
-# Règle pour une recompilation complète
+# Recompilation complète
 # Nettoyage complet puis compilation complète
 re: distclean all
 
@@ -73,22 +75,7 @@ re: distclean all
 # Rend la compilation incrémentale possible et plus fiable et efficace
 -include $(DEPENDS)
 
-# Règles de tests
-test1: $(TARGET)
-	@printf "${BOLD}%s${RESET} : ${B_GN}%s${RESET}\n" "Exécution du test 1"
-	@$(TARGET) < exemples/prog.hex
 
-test2: $(TARGET)
-	@printf "${BOLD}%s${RESET} : ${B_GN}%s${RESET}\n" "Exécution du test 2, option -b"
-	@$(TARGET) -b < exemples/prog.hex
-
-test3: $(TARGET)
-	@printf "${BOLD}%s${RESET} : ${B_GN}%s${RESET}\n" "Exécution du test 3, option -d"
-	@$(TARGET) -d < exemples/prog.hex
-
-test4: $(TARGET)
-	@printf "${BOLD}%s${RESET} : ${B_GN}%s${RESET}\n" "Exécution du test 4, option -db"
-	@$(TARGET) -db < exemples/prog.hex
 
 usage:
 	@echo ""

@@ -1,0 +1,45 @@
+#===============/                  Makefile.mk                  \===============
+#=~~~~~~~~~~~~=|         Fichier de configuration commune        |=~~~~~~~~~~~~=
+#===============\             Configuration Makefile            /===============
+#
+# Auteur : Sylvain Maitre 24002886
+#
+# Date de création 				: 01/10/2025
+# Date de dernière modification : 20/06/2026
+#
+# Description : Configuration commune à tous les Makefiles
+#
+#=============================================================================*/
+
+# Supprimer les messages de Make
+MAKEFLAGS += --no-print-directory
+.SILENT:
+
+CC      := gcc
+CFLAGS  := -std=gnu99 -Wall -Wextra -Werror -pedantic -MMD -MP
+LDFLAGS := 
+LDLIBS  := 
+
+
+# Dossiers
+SRCDIR   := src
+TESTDIR  := tests
+INCDIR   := include
+BUILDDIR := build
+BINDIR   := bin
+ASMDIR   := asm
+
+
+# Couleurs pour l'affichage
+BCYAN := \033[1;36m
+B_BL  := \033[1;34m
+BPINK := \033[1;35m
+B_GN  := \033[1;32m
+B_YL  := \033[1;33m
+B_RD  := \033[1;31m
+BOLD  := \033[1m
+RESET := \033[0m
+
+
+# Variables dérivées
+INC := -I$(INCDIR)

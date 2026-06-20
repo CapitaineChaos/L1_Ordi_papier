@@ -17,14 +17,14 @@ Remarque : Ne fonctionnera pas sur Windows
 #include <getopt.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "signals.h"
+#include "signaux.h"
 #include "pico.h"
 #include "messages.h"
 #include "coeur.h"
 #include "io.h"
-#include "dbg.h"
-#include "dbg/display.h"
-#include "utils.h"
+#include "debogueur.h"
+#include "debogueur/affichage.h"
+#include "outils.h"
 
 void	options(int ac, char** av, Mini_ordi *pico);
 void	afficher_utilisation(char *nom, int exit_code);

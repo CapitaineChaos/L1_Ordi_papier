@@ -1,11 +1,11 @@
 /*==============/                    cx25.1                    \================
 =~~~~~~~~~~~~~=|              Ordinateur en papier              |=~~~~~~~~~~~~~=
-================\              Messages du programme           /================
+================\             Messages du programme            /================
 
 Auteur : Sylvain Maitre     24002886
 
 Date de création :              07/06/2026
-Date de dernière modification : 19/06/2026
+Date de dernière modification : 20/06/2026
 
 Fichier     : messages.c
 Description : Affichage des messages utilisés dans le programme
@@ -49,11 +49,11 @@ void	msg_print_usage(const char *nom) {
 void	msg_print_error(Mini_ordi *pico, int code) {
 	if (!code || code == 6)
 		return ;
-	if (code == 3)
+	if (code == PICO_ERR_MEMOIRE)
 		fprintf(stderr, MSG_ERR_MEMORY, pico->RS);
-	else if (code == 4)
+	else if (code == PICO_ERR_INSTRUCTION)
 		fprintf(stderr, MSG_ERR_INSTRUCTION, pico->OP);
-	else if (code == 5)
+	else if (code == PICO_ERR_COEUR)
 		fprintf(stderr, MSG_ERR_CORE);
 	else
 		fprintf(stderr, MSG_ERR_INCONNUE, code);

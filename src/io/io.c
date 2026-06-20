@@ -12,7 +12,7 @@ Description : Fonctions d'entrées/sorties du mini-ordinateur
 
 ==============================================================================*/
 
-#include "internal.h"
+#include "interne.h"
 #include "io.h"
 #include "messages.h"
 #include "pico.h"

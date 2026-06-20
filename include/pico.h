@@ -5,15 +5,15 @@
 Auteur : Sylvain Maitre     24002886
 
 Date de création :              01/10/2025
-Date de dernière modification : 06/06/2026
+Date de dernière modification : 20/06/2026
 
-Fichier     : mini_ordi.h
+Fichier     : pico.h
 Description : Définitions principales du mini-ordinateur
 
 ==============================================================================*/
 
-#ifndef MINI_ORDI_H
-#define MINI_ORDI_H
+#ifndef PICO_H
+#define PICO_H
 
 #include "pico_types.h"
 #include <stdbool.h>
