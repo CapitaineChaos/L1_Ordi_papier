@@ -27,6 +27,11 @@ La sortie est en décimal par défaut en mode standard et suit le mode d'entrée
 
 ## Utilisation
 
+
+### Valeurs
+
+Si une valeur dépasse 255 ou 0xFF, celle-ci est recalculée automatiquement modulo 256.
+
 ### Chaîne de caractères
 
 ```bash

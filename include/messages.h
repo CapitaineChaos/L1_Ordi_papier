@@ -76,6 +76,8 @@ void	msg_perror_tty(void);
 # define MSG_INPUT_PROGRAM			"Le programme demande la saisie de 2 symboles hexa :"
 # define MSG_INPUT_BOOTSTRAP_DEC	"Le bootstrap demande la saisie d'un nombre décimal entre 0 et 255 :"
 # define MSG_INPUT_PROGRAM_DEC		"Le programme demande la saisie d'un nombre décimal entre 0 et 255 :"
+# define MSG_DEC_MODULO				"Valeur %lu > 255 : ramenée à %u (modulo 256)\n"
+# define MSG_HEX_MODULO				"Valeur %lX > FF : ramenée à %02X (modulo 256)\n"
 
 // Glyphes de l'opération UAL (écrits par le cœur, affichés par le débogueur)
 # define DBG_UAL_NAND			"⊼"

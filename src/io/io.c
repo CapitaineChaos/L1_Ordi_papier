@@ -71,13 +71,23 @@ static u8	lire_entree_classique(Mini_ordi *pico, u8 PC) {
 	msg_print_input_prompt(&pico->modes);
 	stream = io_flux_entree_utilisateur(pico);
 	// Ici l'entrée se fait au clavier : décimal par défaut, hexa si -x
-	if (pico->modes.mode_hexa) {
-		while (!io_lire_octet_hex(stream, &val, true))
-			continue;
-	}
-	else {
-		while (!io_lire_octet_dec(stream, &val))
-			continue;
+	{
+		unsigned long	nb = 0;
+
+		if (pico->modes.mode_hexa) {
+			while (!io_lire_hexa_clavier(stream, &nb))
+				continue;
+			// Trop grand : on ramène modulo 256 (on ne rejette pas la saisie)
+			if (nb > 255 && pico->modes.verbeux)
+				printf(MSG_HEX_MODULO, nb, (unsigned)(nb % 256));
+		}
+		else {
+			while (!io_lire_decimal_clavier(stream, &nb))
+				continue;
+			if (nb > 255 && pico->modes.verbeux)
+				printf(MSG_DEC_MODULO, nb, (unsigned)(nb % 256));
+		}
+		val = (u8)(nb % 256);
 	}
 	return (val);
 }

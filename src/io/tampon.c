@@ -59,35 +59,63 @@ bool	io_parse_dec_byte(const char *dec, u8 *val) {
 }
 
 /**
- * @brief Lit un octet décimal saisi au clavier (terminé par Entrée)
+ * @brief Lit un nombre décimal saisi au clavier (terminé par Entrée)
  * @param stream Le flux d'entrée
- * @param val Pointeur vers l'octet résultant
- * @return true si la lecture a réussi, false sinon
+ * @param nb Pointeur vers le nombre résultant (peut dépasser 255)
+ * @return true si un nombre a été lu, false sinon (EOF / saisie vide)
  * @note Seule la saisie clavier utilise le décimal ; le stdin reste hexa.
+ *       Un éventuel dépassement (> 255) est géré par l'appelant (modulo 256).
  */
-bool	io_lire_octet_dec(FILE *stream, u8 *val) {
-	char	dec[4];
+bool	io_lire_decimal_clavier(FILE *stream, unsigned long *nb) {
+	char	dec[16];
 	int		i;
 	int		c;
 
 	i = 0;
 	while ((c = fgetc(stream)) != EOF && c != '\n') {
-		if (isdigit(c) && i < 3)
+		if (isdigit(c) && i < (int)sizeof(dec) - 1)
 			dec[i++] = (char)c;
 	}
 	dec[i] = '\0';
-	if (c == EOF && i == 0)
+	if (i == 0)
 		return (false);
-	return (io_parse_dec_byte(dec, val));
+	*nb = strtoul(dec, NULL, 10);
+	return (true);
 }
 
 /**
- * @brief Lit un octet hexadécimal à partir d'un flux
+ * @brief Lit un nombre hexadécimal saisi au clavier (terminé par Entrée)
+ * @param stream Le flux d'entrée
+ * @param nb Pointeur vers le nombre résultant (peut dépasser 0xFF)
+ * @return true si un nombre a été lu, false sinon (EOF / saisie vide)
+ * @note Pendant clavier uniquement ; le stdin garde io_lire_octet_hex.
+ *       Un éventuel dépassement (> 0xFF) est géré par l'appelant (modulo 256).
+ */
+bool	io_lire_hexa_clavier(FILE *stream, unsigned long *nb) {
+	char	hex[16];
+	int		i;
+	int		c;
+
+	i = 0;
+	while ((c = fgetc(stream)) != EOF && c != '\n') {
+		if (isxdigit(c) && i < (int)sizeof(hex) - 1)
+			hex[i++] = (char)c;
+	}
+	hex[i] = '\0';
+	if (i == 0)
+		return (false);
+	*nb = strtoul(hex, NULL, 16);
+	return (true);
+}
+
+/**
+ * @brief Lit un octet hexadécimal à partir d'un flux (stdin / fichier)
  * @param stream Le flux d'entrée
  * @param val Pointeur vers l'octet résultant
  * @return true si la lecture a réussi, false sinon
+ * @note Gère les commentaires (; et #) ; réservé au chargement du buffer.
  */
-bool	io_lire_octet_hex(FILE *stream, u8 *val, bool clavier) {
+bool	io_lire_octet_hex(FILE *stream, u8 *val) {
 	bool	commentaire;
 	char	hex[3];
 	int		i;
@@ -103,14 +131,7 @@ bool	io_lire_octet_hex(FILE *stream, u8 *val, bool clavier) {
 		if (c == EOF)
 			return (false);
 		if (c == '\n')
-		{
-			if (clavier && i > 0) {
-				hex[1] = hex[0];
-				hex[0] = '0';
-				return (io_parse_hex_byte(hex, val));
-			}
 			commentaire = false;
-		}
 		if (c == ';' || c == '#')
 			commentaire = true;
 		if (commentaire)
@@ -154,7 +175,7 @@ static void	ajouter_flux_buffer_entree(Mini_ordi *pico, FILE *stream,
 	const char *source) {
 	u8	val;
 
-	while (io_lire_octet_hex(stream, &val, false)) {
+	while (io_lire_octet_hex(stream, &val)) {
 		ajouter_octet_buffer_entree(pico, val, source);
 	}
 	if (ferror(stream)) {
