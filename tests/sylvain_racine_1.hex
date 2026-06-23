@@ -1,89 +1,75 @@
+30 ; Adresse de départ
+6C ; Longueur du programme
 
-
-30
-6C
-; ==|= hexa =|=== adresse ===|===== Mnémonique ======|================== Commentaire ====================|
+;@|  hexa  |   adresse   |  Mnémonique  |       Sémantique       | Commentaire
 ; Babylone:
-49 63 ; 30 31 ; IN α 63 ; (N) ← Entrée ; Saisie du nombre (N)
-00 07 ; 32 33 ; LOAD # 07 ; A ← 07 ; 07
-48 64 ; 34 35 ; STORE α 64 ; (X) ← A ; X ← 7
+    49 63  ; 30 31       ; IN α 63      ; (N) ← Entrée           ; Saisie du nombre (N)
+    00 07  ; 32 33       ; LOAD # 07    ; A ← 07                 ;
+    48 64  ; 34 35       ; STORE α 64   ; (X) ← A                ; X ← 7
 ; Suite:
-40 64 ; 36 37 ; LOAD α 64 ; A ← (X) ; 
-48 65 ; 38 39 ; STORE α 65 ; (M) ← A ; M ← X
-48 79 ; 3A 3B ; STORE α 79 ; (b) ← A ; b ← X (diviseur)
-40 63 ; 3C 3D ; LOAD α 63 ; A ← (N) ; STORE α   N
-48 78 ; 3E 3F ; STORE α 78 ; (a) ← A ; a ← N (dividende)
-; @imm name=Retour1
-00 46 ; 40 41 ; LOAD # 46 ; A ← Retour1 ; Préparer le retour 1
-48 9B ; 42 43 ; STORE α 9B ; (retdiv) ← A ; Mettre l'adresse de retour
-10 66 ; 44 45 ; JUMP α 66 ; PC ← Division ; Sauter à division
-; Retour1: ; Le résultat de N/X est encore dans le registre A ou Q
-40 64 ; 46 47 ; LOAD α 64 ; A ← (X) ; 
-60 7A ; 48 49 ; ADD α 7A ; A ← A + (Q) ; A ← N/X + X
-48 78 ; 4A 4B ; STORE α 78 ; (a) ← A ; a ← N/X + X
-00 02 ; 4C 4D ; LOAD # 02 ; A ← 02 ; A ← 02
-48 79 ; 4E 4F ; STORE α 79 ; (b) ← A ; b ← 02
-; @imm name=Retour2
-00 56 ; 50 51 ; LOAD # 56 ; A ← Retour2 ; Préparer le retour 2
-48 9B ; 52 53 ; STORE α 9B ; (retdiv) ← A ; 50 51             STORE α   RET
-10 66 ; 54 55 ; JUMP α 66 ; PC ← Division ; Sauter à division
-; Retour2: ; Le résultat de (X+N/X)/2 est dans le registre A ou Q
-40 7A ; 56 57 ; LOAD α 7A ; A ← (Q) ; 
-48 64 ; 58 59 ; STORE α 64 ; (X) ← A ; 
-61 65 ; 5A 5B ; SUB α 65 ; A ← A − (M) ; 
-12 60 ; 5C 5D ; BRZ α 60 ; si A=0 : PC ← Afficher ; 58 59             BRZ α     Aff
-10 36 ; 5E 5F ; JUMP α 36 ; PC ← Suite ; 5A 5B             JUMP α    Suite
+    40 64  ; 36 37       ; LOAD α 64    ; A ← (X)                ;
+    48 65  ; 38 39       ; STORE α 65   ; (M) ← A                ; M ← X
+    48 79  ; 3A 3B       ; STORE α 79   ; (b) ← A                ; b ← X (diviseur)
+    40 63  ; 3C 3D       ; LOAD α 63    ; A ← (N)                ;
+    48 78  ; 3E 3F       ; STORE α 78   ; (a) ← A                ; a ← N (dividende)
+    00 46  ; 40 41       ; LOAD # 46    ; A ← Retour1            ;
+    48 9B  ; 42 43       ; STORE α 9B   ; (retdiv) ← A           ; Préparer le retour 1
+    10 66  ; 44 45       ; JUMP α 66    ; PC ← Division          ; Sauter à division
+; Retour1:                                                       ; Retour de l'appel de divison
+    40 64  ; 46 47       ; LOAD α 64    ; A ← (X)                ;
+    60 7A  ; 48 49       ; ADD α 7A     ; A ← A + (Q)            ; Q = N/X
+    48 78  ; 4A 4B       ; STORE α 78   ; (a) ← A                ; a ← N/X + X
+    00 02  ; 4C 4D       ; LOAD # 02    ; A ← 02                 ;
+    48 79  ; 4E 4F       ; STORE α 79   ; (b) ← A                ; b ← 02
+    00 56  ; 50 51       ; LOAD # 56    ; A ← Retour2            ;
+    48 9B  ; 52 53       ; STORE α 9B   ; (retdiv) ← A           ; Préparer le retour 2
+    10 66  ; 54 55       ; JUMP α 66    ; PC ← Division          ; Aller à division
+; Retour2:                                                       ; Retour de l'appel de division
+    40 7A  ; 56 57       ; LOAD α 7A    ; A ← (Q)                ; Q = (N/X + X)/2
+    48 64  ; 58 59       ; STORE α 64   ; (X) ← A                ;
+    61 65  ; 5A 5B       ; SUB α 65     ; A ← A − (M)            ;
+    12 60  ; 5C 5D       ; BRZ α 60     ; si A=0 : PC ← Afficher ; Si X < M, Afficher X
+    10 36  ; 5E 5F       ; JUMP α 36    ; PC ← Suite             ; Sinon, aller à suite
 ; Afficher:
-41 64 ; 60 61 ; OUT α 64 ; Sortie ← (X) ; 5C 5D             OUT α     X
-FF ; 62 ; STOP ; arrêt ; 
-; @var name=N
-00 ; 63 ; donnée N ; (63) = 00 ; N
-; @var name=X
-00 ; 64 ; donnée X ; (64) = 00 ; X
-; @var name=M
-00 ; 65 ; donnée M ; (65) = 00 ; M
+    41 64  ; 60 61       ; OUT α 64     ; Sortie ← (X)           ; 5C 5D             OUT α     X
+    FF     ; 62          ; STOP         ; arrêt                  ;
+    00     ; 63          ; @var name=N                 (63) = 00 ; N
+    00     ; 64          ; @var name=X                 (64) = 00 ; X
+    00     ; 65          ; @var name=M                 (65) = 00 ; M
 ; Division:
-00 00 ; 66 67 ; LOAD # 00 ; A ← 00 ; 62 63             LOAD #    00        A ← 0
-48 7A ; 68 69 ; STORE α 7A ; (Q) ← A ; 64 65             STORE α   Q         (76) ← A              Q ← 0
-40 79 ; 6A 6B ; LOAD α 79 ; A ← (b) ; 66 67             LOAD α    b         A ← (75)
-12 9A ; 6C 6D ; BRZ α 9A ; si A=0 : PC ← ret ; 68 69             BRZ α     aff       Si A=0, PC ← 96       Si b = 0,     aller à ret
-40 78 ; 6E 6F ; LOAD α 78 ; A ← (a) ; 6A 6B             LOAD α    a         A ← (77)
-48 7B ; 70 71 ; STORE α 7B ; (R) ← A ; 6C 6D             STORE α   R         (77) ← A              R ← a
+    00 00  ; 66 67       ; LOAD # 00    ; A ← 00                 ;
+    48 7A  ; 68 69       ; STORE α 7A   ; (Q) ← A                ; Initialiser Q à 0
+    40 79  ; 6A 6B       ; LOAD α 79    ; A ← (b)                ;
+    12 9A  ; 6C 6D       ; BRZ α 9A     ; si A=0 : PC ← ret      ; Si b = 0, aller à ret
+    40 78  ; 6E 6F       ; LOAD α 78    ; A ← (a)                ;
+    48 7B  ; 70 71       ; STORE α 7B   ; (R) ← A                ; R ← a
 ; t1:
-40 7B ; 72 73 ; LOAD α 7B ; A ← (R) ; 6E 6F             LOAD α    R         A ← (77)
-11 7C ; 74 75 ; BRN α 7C ; si A<0 : PC ← t2 ; 70 71             BRN α               Si A<0, PC ← 78       Si R < 0,     aller à t2
-10 82 ; 76 77 ; JUMP α 82 ; PC ← t3 ; 72 73             JUMP α              PC ← 7E               Sinon         aller à t3
-; @var name=a
-00 ; 78 ; donnée a ; (78) = 00 ; 74                                                          variable a
-; @var name=b
-00 ; 79 ; donnée b ; (79) = 00 ; 75                                                          variable b
-; @var name=Q
-00 ; 7A ; donnée Q ; (7A) = 00 ; 76                                                          variable Q
-; @var name=R
-00 ; 7B ; donnée R ; (7B) = 00 ; 77                                                          variable R
+    40 7B  ; 72 73       ; LOAD α 7B    ; A ← (R)                ;
+    11 7C  ; 74 75       ; BRN α 7C     ; si A<0 : PC ← t2       ; Si R < 0, aller à t2
+    10 82  ; 76 77       ; JUMP α 82    ; PC ← t3                ; Sinon, aller à t3
+    00     ; 78          ; @var name=a                 (78) = 00 ;
+    00     ; 79          ; @var name=b                 (79) = 00 ;
+    00     ; 7A          ; @var name=Q                 (7A) = 00 ;
+    00     ; 7B          ; @var name=R                 (7B) = 00 ;
 ; t2:
-40 79 ; 7C 7D ; LOAD α 79 ; A ← (b) ; 78 79             LOAD α              A ← (75)
-11 86 ; 7E 7F ; BRN α 86 ; si A<0 : PC ← t4 ; 7A 7B             BRN α               Si A<0, PC ← 82       Si B < 0,     aller à t4
-10 8C ; 80 81 ; JUMP α 8C ; PC ← tok ; 7C 7D             JUMP α              PC ← 88               Sinon         aller à tok,
+    40 79  ; 7C 7D       ; LOAD α 79    ; A ← (b)                ;
+    11 86  ; 7E 7F       ; BRN α 86     ; si A<0 : PC ← t4       ; Si B < 0, aller à t4
+    10 8C  ; 80 81       ; JUMP α 8C    ; PC ← tok               ; Sinon, aller à tok,
 ; t3:
-40 79 ; 82 83 ; LOAD α 79 ; A ← (b) ; 7E 7F             LOAD α              A ← (75)
-11 9A ; 84 85 ; BRN α 9A ; si A<0 : PC ← ret ; 80 81             BRN α               Si A<0, PC ← 96       Si b < 0,     aller à ret
+    40 79  ; 82 83       ; LOAD α 79    ; A ← (b)                ;
+    11 9A  ; 84 85       ; BRN α 9A     ; si A<0 : PC ← ret      ; Si b < 0, aller à ret
 ; t4:
-40 7B ; 86 87 ; LOAD α 7B ; A ← (R) ; 82 83             LOAD α              A ← (77)
-61 79 ; 88 89 ; SUB α 79 ; A ← A − (b) ; 84 85             SUB α               A ← A - (75)
-11 9A ; 8A 8B ; BRN α 9A ; si A<0 : PC ← ret ; 86 87             BRN α               Si A<0, PC ← 96       Si R - B < 0, aller à ret
+    40 7B  ; 86 87       ; LOAD α 7B    ; A ← (R)                ;
+    61 79  ; 88 89       ; SUB α 79     ; A ← A − (b)            ;
+    11 9A  ; 8A 8B       ; BRN α 9A     ; si A<0 : PC ← ret      ; Si R - B < 0, aller à ret
 ; tok:
-40 7B ; 8C 8D ; LOAD α 7B ; A ← (R) ; 88 89             LOAD α              A ← (77)
-61 79 ; 8E 8F ; SUB α 79 ; A ← A − (b) ; 8A 8B             SUB α               A ← A - (75)
-48 7B ; 90 91 ; STORE α 7B ; (R) ← A ; 8C 8D             STORE α             (77) ← A              R ← R - B
-40 7A ; 92 93 ; LOAD α 7A ; A ← (Q) ; 8E 8F             LOAD α              A ← (76)
-20 01 ; 94 95 ; ADD # 01 ; A ← A + 01 ; 90 91             ADD #               A ← A + 1
-48 7A ; 96 97 ; STORE α 7A ; (Q) ← A ; 92 93             STORE α             (76) ← A              Q ← Q + 1
-10 72 ; 98 99 ; JUMP α 72 ; PC ← t1 ; 94 95             JUMP α              PC ← 6E               Aller à t1
+    40 7B  ; 8C 8D       ; LOAD α 7B    ; A ← (R)                ;
+    61 79  ; 8E 8F       ; SUB α 79     ; A ← A − (b)            ;
+    48 7B  ; 90 91       ; STORE α 7B   ; (R) ← A                ; R ← R - B
+    40 7A  ; 92 93       ; LOAD α 7A    ; A ← (Q)                ;
+    20 01  ; 94 95       ; ADD # 01     ; A ← A + 01             ;
+    48 7A  ; 96 97       ; STORE α 7A   ; (Q) ← A                ; Q ← Q + 1
+    10 72  ; 98 99       ; JUMP α 72    ; PC ← t1                ; Aller à t1
 ; ret:
 ; @alias operande=retdiv
-10 00 ; 9A 9B ; JUMP α 00 ; PC ← 00 ; Retour à l'envoyeur
-
-
-
-
+    10 00  ; 9A 9B       ; JUMP α 00    ; PC ← 00                ; Retour à l'envoyeur
