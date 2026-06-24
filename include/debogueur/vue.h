@@ -5,7 +5,7 @@
 Auteur : Sylvain Maitre     24002886
 
 Date de création :              11/06/2026
-Date de dernière modification : 20/06/2026
+Date de dernière modification : 22/06/2026
 
 Fichier     : debogueur/vue.h
 Description : Déclarations de la vue principale du débogueur

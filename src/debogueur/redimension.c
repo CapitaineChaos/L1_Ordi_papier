@@ -5,7 +5,7 @@
 Auteur : Sylvain Maitre     24002886
 
 Date de création :              13/06/2026
-Date de dernière modification : 20/06/2026
+Date de dernière modification : 22/06/2026
 
 Fichier     : debogueur/redimension.c
 Description : Gestion du redimensionnement du terminal pour le débogueur

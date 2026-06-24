@@ -5,7 +5,7 @@
 Auteur : Sylvain Maitre     24002886
 
 Date de création :              13/06/2026
-Date de dernière modification : 20/06/2026
+Date de dernière modification : 23/06/2026
 
 Fichier     : signaux.h
 Description : Gestion des signaux du programme
@@ -17,5 +17,6 @@ Description : Gestion des signaux du programme
 # define SIGNAUX_H
 
 void	init_sig(void);
+void	signal_set_debug_display(int actif);
 
 #endif

@@ -5,7 +5,7 @@
 Auteur : Sylvain Maitre     24002886
 
 Date de création :              12/06/2026
-Date de dernière modification : 13/06/2026
+Date de dernière modification : 22/06/2026
 
 Fichier     : io/tampon.c
 Description : Chargement et lecture des flux d'entrée

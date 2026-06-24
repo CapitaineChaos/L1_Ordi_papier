@@ -5,7 +5,7 @@
 Auteur : Sylvain Maitre     24002886
 
 Date de création :              11/06/2026
-Date de dernière modification : 20/06/2026
+Date de dernière modification : 23/06/2026
 
 Fichier     : debogueur/affichage.c
 Description : Display différentiel 80x27 du débogueur
@@ -14,6 +14,7 @@ Description : Display différentiel 80x27 du débogueur
 
 #include "debogueur/affichage.h"
 #include "debogueur/libelles.h"
+#include "signaux.h"
 #include <stdarg.h>
 #include <string.h>
 #include <sys/ioctl.h>
@@ -52,6 +53,7 @@ void	dbg_display_enter(Dbg *dbg) {
 	fprintf(dbg->terminal.tty, D_ALT_SCREEN D_NO_WRAP D_HIDE_CURSOR D_HOME E_SCREEN_ALL);
 	fflush(dbg->terminal.tty);
 	dbg->terminal.viewer_actif = true;
+	signal_set_debug_display(true);
 	dbg->screen.initialise = false;
 }
 
@@ -69,6 +71,7 @@ void	dbg_display_leave(Dbg *dbg) {
 	fprintf(dbg->terminal.tty, E_LINE_ALL "\n");
 	fflush(dbg->terminal.tty);
 	dbg->terminal.viewer_actif = false;
+	signal_set_debug_display(false);
 	dbg->screen.initialise = false;
 }
 

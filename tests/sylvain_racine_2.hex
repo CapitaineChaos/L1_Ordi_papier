@@ -3,10 +3,10 @@
 
 ;@|  hexa  |   adresse   |  Mnémonique  |        Sémantique        | Commentaire
 ; ################################################################################
-; #                          Algorithme de Babylone
-; #            Extraire la racine d'un nombre avec la méthode de Héron v2
-; # Auteur : Sylvain Maitre 24002886
-; # Date   : 23/06/2026
+; #                          Algorithme de Babylone                              #
+; #            Extraire la racine d'un nombre avec la méthode de Héron v2        #
+; # Auteur : Sylvain Maitre 24002886                                             #
+; # Date   : 23/06/2026                                                          #
 ; ################################################################################
 ; Babylone:
     49 72  ;    30 31    ; IN α     72  ; (N) ← Entrée             ; Saisie du nombre (N)
@@ -36,13 +36,13 @@
 ; Retour2:                                                         ; Retour de l'appel de division
     40 8A  ;    5C 5D    ; LOAD α   8A  ; A ← (Q)                  ; Q = (N/X + X)/2
     48 73  ;    5E 5F    ; STORE α  73  ; (X) ← A                  ; X ← Q
-    61 75  ;    60 61    ; SUB α    75  ; A ← A − (Y)              ;
+    61 75  ;    60 61    ; SUB α    75  ; A ← A - (Y)              ;
     12 66  ;    62 63    ; BRZ α    66  ; si A=0 : PC ← Afficher   ; Si X = Y, aller à Afficher
     10 38  ;    64 65    ; JUMP α   38  ; PC ← Suite               ; Sinon, aller à Suite
 ; Afficher:
     40 73  ;    66 67    ; LOAD α   73  ; A ← (X)                  ;
-    61 74  ;    68 69    ; SUB α    74  ; A ← A − (M)              ;
-    11 6F  ;    6A 6B    ; BRN α    6F  ; si A<0 : PC ← Afficher_X ; Si X = Y, aller à Afficher_X
+    61 74  ;    68 69    ; SUB α    74  ; A ← A - (M)              ;
+    11 6F  ;    6A 6B    ; BRN α    6F  ; si A<0 : PC ← Afficher_X ; Si X < M, aller à Afficher_X
 ; Afficher_M:
     41 74  ;    6C 6D    ; OUT α    74  ; Sortie ← (M)             ; Afficher M
     FF     ;    6E       ; STOP         ; arrêt                    ;
@@ -54,9 +54,9 @@
     00     ;    74       ; @var name=M                   (74) = 00 ; Valeur précédente de X
     00     ;    75       ; @var name=Y                   (75) = 00 ; Valeur précédente de M
 ; ################################################################################
-; #                  Sous programme de division euclidienne
-; #      Les variables a et b constituent les entrées ; Q et R les sorties
-; #                          Avec a = Q * b + R
+; #                  Sous programme de division euclidienne                      #
+; #      Les variables a et b constituent les entrées ; Q et R les sorties       #
+; #                          Avec a = Q * b + R                                  #
 ; ################################################################################
 ; Division:
     00 00  ;    76 77    ; LOAD #   00  ; A ← 00                   ;
@@ -82,11 +82,11 @@
     11 AA  ;    94 95    ; BRN α    AA  ; si A<0 : PC ← ret        ; Si b < 0, aller à ret
 ; t4:
     40 8B  ;    96 97    ; LOAD α   8B  ; A ← (R)                  ;
-    61 89  ;    98 99    ; SUB α    89  ; A ← A − (b)              ;
+    61 89  ;    98 99    ; SUB α    89  ; A ← A - (b)              ;
     11 AA  ;    9A 9B    ; BRN α    AA  ; si A<0 : PC ← ret        ; Si R - B < 0, aller à ret
 ; tok:
     40 8B  ;    9C 9D    ; LOAD α   8B  ; A ← (R)                  ;
-    61 89  ;    9E 9F    ; SUB α    89  ; A ← A − (b)              ;
+    61 89  ;    9E 9F    ; SUB α    89  ; A ← A - (b)              ;
     48 8B  ;    A0 A1    ; STORE α  8B  ; (R) ← A                  ; R ← R - B
     40 8A  ;    A2 A3    ; LOAD α   8A  ; A ← (Q)                  ;
     20 01  ;    A4 A5    ; ADD #    01  ; A ← A + 01               ;
@@ -94,4 +94,4 @@
     10 82  ;    A8 A9    ; JUMP α   82  ; PC ← t1                  ; Aller à t1
 ; ret:
 ; @alias operande=retdiv
-    10 00  ;    AA AB    ; JUMP α   00  ; PC ← 00                  ; Retour à l'envoyeur
+    10 00  ;    AA AB    ; JUMP α   00  ; PC ← 00                  ; Retour de l'appel

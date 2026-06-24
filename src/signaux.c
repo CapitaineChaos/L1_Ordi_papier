@@ -5,7 +5,7 @@
 Auteur : Sylvain Maitre     24002886
 
 Date de création :              13/06/2026
-Date de dernière modification : 20/06/2026
+Date de dernière modification : 23/06/2026
 
 Fichier     : signaux.c
 Description : Gestion des signaux du programme
@@ -16,8 +16,37 @@ Description : Gestion des signaux du programme
 #include "ansi.h"
 #include "messages.h"
 #include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <stddef.h>
+#include <unistd.h>
+
+static volatile sig_atomic_t	g_debug_display = 0;
+
+static void	signal_write(const char *str) {
+	size_t	len;
+
+	len = 0;
+	while (str[len])
+		len++;
+	write(STDERR_FILENO, str, len);
+}
+
+static const char	*signal_message(int sig) {
+	if (sig == SIGINT)
+		return (MSG_SIG_INT);
+	if (sig == SIGTERM)
+		return (MSG_SIG_TERM);
+	if (sig == SIGQUIT)
+		return (MSG_SIG_QUIT);
+	if (sig == SIGHUP)
+		return (MSG_SIG_HUP);
+	if (sig == SIGTSTP)
+		return (MSG_SIG_STP);
+	return (MSG_SIG_AUTRE);
+}
+
+void	signal_set_debug_display(int actif) {
+	g_debug_display = (actif != 0);
+}
 
 /**
  * @brief Handler pour intercepter les signaux d'interruption.
@@ -26,10 +55,11 @@ Description : Gestion des signaux du programme
  * @note Réinitialise les couleurs du terminal avant de quitter proprement.
  */
 void	signal_handler(int sig) {
-	printf(RST D_WRAP D_SHOW_CURSOR D_MAIN_SCREEN E_LINE_ALL "\n\n");
-	msg_print_signal(sig);
-	printf(RST D_WRAP D_SHOW_CURSOR E_LINE_ALL "\n");
-	exit(EXIT_SUCCESS);
+	if (g_debug_display)
+		signal_write(RST D_WRAP D_SHOW_CURSOR D_MAIN_SCREEN E_LINE_ALL "\r");
+	signal_write("\n");
+	signal_write(signal_message(sig));
+	_exit(128 + sig);
 }
 
 /**

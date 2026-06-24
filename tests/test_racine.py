@@ -26,7 +26,7 @@ PICO = "../bin/pico"
 # Nombre de threads
 NPROC = os.cpu_count()
 # nombre de marques par ligne
-LARGEUR = 64
+LARGEUR = 32
 
 
 def lire_programme():

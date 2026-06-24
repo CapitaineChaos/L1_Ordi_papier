@@ -21,10 +21,10 @@ V  : Valeur donnée immédiatement
 Mnémoniques     Code opératoire         description
 
 Arithmétique
-ADD #           20                      A ← A+V
+ADD #           20                      A ← A + V
 ADD α           60                      A ← A + (α)
 ADD *α          E0                      A ← A + *(α)
-SUB #           21                      A ← A−V
+SUB #           21                      A ← A − V
 SUB α           61                      A ← A − (α)
 SUB *α          E1                      A ← A − *(α)
 
