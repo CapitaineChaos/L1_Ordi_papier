@@ -5,8 +5,8 @@
 Lors de l'utilisation de toutes les données d'entrée, les priorités sont les suivantes de la plus haute à la plus basse :
 
 1. Les options -a et -t (en décimal, octal, ou hexadécimal)
-2. Le stdin (pipe, redirection, here-document, here-string)
-3. L'option -f
+2. L'option -f
+3. Le stdin (pipe, redirection, here-document, here-string)
 
 
 ## Mode décimal / hexadécimal
@@ -95,3 +95,10 @@ bin/pico <<< "801F004848704170006548704170006C48704170006C48704170006F48704170FF
 ```bash
 bin/pico -d -f exemples/simple.hex
 ```
+
+### Fichier en argument et entrée complémentaire
+
+```bash
+bin/pico -f exemples/test_input.hex <<< "2233" -x
+```
+

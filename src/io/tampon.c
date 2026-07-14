@@ -5,7 +5,7 @@
 Auteur : Sylvain Maitre     24002886
 
 Date de création :              12/06/2026
-Date de dernière modification : 22/06/2026
+Date de dernière modification : 14/07/2026
 
 Fichier     : io/tampon.c
 Description : Chargement et lecture des flux d'entrée
@@ -246,9 +246,9 @@ static void	ajouter_options_prog_buffer_entree(Mini_ordi *pico) {
 void	charger_buffer_entree(Mini_ordi *pico) {
 	pico->IO.stdin_is_tty = isatty(STDIN_FILENO);
 	ajouter_options_prog_buffer_entree(pico);
+	ajouter_fichier_buffer_entree(pico);
 	if (!pico->IO.stdin_is_tty)
 		ajouter_flux_buffer_entree(pico, stdin, "stdin");
-	ajouter_fichier_buffer_entree(pico);
 }
 
 /**

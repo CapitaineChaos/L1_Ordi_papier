@@ -5,7 +5,7 @@
 Auteur : Sylvain Maitre     24002886
 
 Date de création :              01/10/2025
-Date de dernière modification : 22/06/2026
+Date de dernière modification : 14/07/2026
 
 Description : Point d'entrée du programme
 Compilation : make
@@ -196,9 +196,9 @@ void	options(int ac, char** av, Mini_ordi *pico) {
 		{"ascii", no_argument, NULL, 'p'},
 		{0, 0, 0, 0},
 	};
-	int						opt;
-	bool					adresse_fournie = false;
-	bool					taille_fournie = false;
+	int		opt;
+	bool	adresse_fournie = false;
+	bool	taille_fournie = false;
 
 	while ((opt = getopt_long(ac, av, "a:dbhf:t:vxnp", long_options, NULL)) != -1) {
 		switch (opt) {
