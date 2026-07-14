@@ -4,7 +4,7 @@
 
 Lors de l'utilisation de toutes les données d'entrée, les priorités sont les suivantes de la plus haute à la plus basse :
 
-1. Les options -a et -t
+1. Les options -a et -t (en décimal, octal, ou hexadécimal)
 2. Le stdin (pipe, redirection, here-document, here-string)
 3. L'option -f
 

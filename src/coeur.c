@@ -5,7 +5,7 @@
 Auteur : Sylvain Maitre     24002886
 
 Date de création :              01/10/2025
-Date de dernière modification : 22/06/2026
+Date de dernière modification : 14/07/2026
 
 Version du coeur : 1.3
 
@@ -28,7 +28,7 @@ Description : Exécution des instructions
  */
 int	m_01(Mini_ordi *pico) {
 	pico->RS = pico->PC;
-	return (0);
+	return (PICO_OK);
 }
 
 /**
@@ -37,7 +37,7 @@ int	m_01(Mini_ordi *pico) {
  */
 int	m_02(Mini_ordi *pico) {
 	pico->PC = pico->RM;
-	return (1);
+	return (PICO_PHASE_1);
 }
 
 /**
@@ -46,7 +46,7 @@ int	m_02(Mini_ordi *pico) {
  */
 int	m_03(Mini_ordi *pico) {
 	pico->A = pico->RM;
-	return (0);
+	return (PICO_OK);
 }
 
 /**
@@ -55,7 +55,7 @@ int	m_03(Mini_ordi *pico) {
  */
 int	m_04(Mini_ordi *pico) {
 	pico->RM = pico->A;
-	return (0);
+	return (PICO_OK);
 }
 
 /**
@@ -64,7 +64,7 @@ int	m_04(Mini_ordi *pico) {
  */
 int	m_05(Mini_ordi *pico) {
 	pico->OP = pico->RM;
-	return (0);
+	return (PICO_OK);
 }
 
 /**
@@ -73,7 +73,7 @@ int	m_05(Mini_ordi *pico) {
  */
 int	m_06(Mini_ordi *pico) {
 	pico->AD = pico->RM;
-	return (0);
+	return (PICO_OK);
 }
 
 /**
@@ -82,7 +82,7 @@ int	m_06(Mini_ordi *pico) {
  */
 int	m_07(Mini_ordi *pico) {
 	pico->RS = pico->AD;
-	return (0);
+	return (PICO_OK);
 }
 
 /**
@@ -91,7 +91,7 @@ int	m_07(Mini_ordi *pico) {
  */
 int	m_08(Mini_ordi *pico) {
 	pico->RM = pico->IO.in;
-	return (0);
+	return (PICO_OK);
 }
 
 /**
@@ -101,7 +101,7 @@ int	m_08(Mini_ordi *pico) {
 int	m_09(Mini_ordi *pico) {
 	pico->IO.out = pico->RM;
 	afficher_sortie(pico, pico->IO.out);
-	return (0);
+	return (PICO_OK);
 }
 
 u8	UAL_add(u8 a, u8 b) { return (a + b); }
@@ -117,7 +117,7 @@ u8	UAL_nand(u8 a, u8 b) { return (~(a & b)); }
 int	m_10(Mini_ordi *pico) {
 	pico->UAL = UAL_add;
 	snprintf(pico->dbg->texte.operation_ual, DBG_UAL_SIZE, "%s", DBG_UAL_ADD);
-	return (0);
+	return (PICO_OK);
 }
 
 /**
@@ -127,7 +127,7 @@ int	m_10(Mini_ordi *pico) {
 int	m_11(Mini_ordi *pico) {
 	pico->UAL = UAL_sub;
 	snprintf(pico->dbg->texte.operation_ual, DBG_UAL_SIZE, "%s", DBG_UAL_SUB);
-	return (0);
+	return (PICO_OK);
 }
 
 /**
@@ -137,7 +137,7 @@ int	m_11(Mini_ordi *pico) {
 int	m_17(Mini_ordi *pico) {
 	pico->UAL = UAL_nand;
 	snprintf(pico->dbg->texte.operation_ual, DBG_UAL_SIZE, "%s", DBG_UAL_NAND);
-	return (0);
+	return (PICO_OK);
 }
 
 
@@ -147,7 +147,7 @@ int	m_17(Mini_ordi *pico) {
  */
 int	m_12(Mini_ordi *pico) {
 	pico->A = pico->UAL(pico->A, pico->RM);
-	return (0);
+	return (PICO_OK);
 }
 
 /**
@@ -156,19 +156,19 @@ int	m_12(Mini_ordi *pico) {
  */
 int	m_13(Mini_ordi *pico) {
 	pico->RM = pico->mem[pico->RS];
-	return (0);
+	return (PICO_OK);
 }
 
 /**
  * @brief Microcode 14
  * @note mem[RS] <- RM
- * @note Retourner 3 pour indiquer une erreur de mémoire
+ * @note Retourner PICO_ERR_MEMOIRE si une erreur de mémoire
  */
 int	m_14(Mini_ordi *pico) {
 	if (pico->RS < 32)
-		return (3);
+		return (PICO_ERR_MEMOIRE);
 	pico->mem[pico->RS] = pico->RM;
-	return (0);
+	return (PICO_OK);
 }
 
 /**
@@ -177,7 +177,7 @@ int	m_14(Mini_ordi *pico) {
  */
 int	m_15(Mini_ordi *pico) {
 	pico->PC++;
-	return (0);
+	return (PICO_OK);
 }
 
 /**
@@ -186,7 +186,7 @@ int	m_15(Mini_ordi *pico) {
  */
 int	m_16(Mini_ordi *pico) {
 	pico->IO.in = lire_entree(pico, pico->PC);
-	return (0);
+	return (PICO_OK);
 }
 
 
@@ -220,13 +220,13 @@ pstatus	exec_microcode(Mini_ordi *pico, Dbg *dbg, int microcode) {
 /**
  * @brief Phase : exécution du microcode
  * @return Code de retour :
- * @note 0 : OK
- * @note 1 : Retour à la phase 1
- * @note 2 : Fin de la boucle microcode
- * @note 3 : Erreur mémoire
- * @note 4 : Instruction inconnue
- * @note 5 : Défaillance processeur
- * @note 6 : Extinction de Pico
+ * @note 0  : OK
+ * @note 1  : Aller en Phase 1
+ * @note 2  : Fin de la phase microcode
+ * @note 8  : Accès mémoire interdit
+ * @note 16 : Instruction inconnue
+ * @note 32 : Défaillance processeur
+ * @note 64 : Extinction de Pico
  */
 pstatus	phase(Mini_ordi *pico, Dbg *dbg, t_mcseq *mseq, int phase) {
 	int		i = 0;
@@ -245,7 +245,7 @@ pstatus	phase(Mini_ordi *pico, Dbg *dbg, t_mcseq *mseq, int phase) {
 		exec_debogueur(pico, dbg, phase, mseq, i);
 		if (dbg && dbg->exec.restart_cycle) {
 			dbg->exec.restart_cycle = false;
-			return (PICO_JUMP_PHASE_1);
+			return (PICO_PHASE_1);
 		}
 		status = exec_microcode(pico, dbg, mseq->sequence[i]);
 		if (status) return (status);
@@ -261,13 +261,13 @@ pstatus	phase(Mini_ordi *pico, Dbg *dbg, t_mcseq *mseq, int phase) {
  * @param pico Le mini-ordinateur
  * @param dbg Le débogueur
  * @return Code de retour :
- * @note 0 : OK
- * @note 1 : Retour à la phase 1
- * @note 2 : Fin de la boucle microcode
- * @note 3 : Erreur mémoire
- * @note 4 : Instruction inconnue
- * @note 5 : Défaillance processeur
- * @note 6 : Extinction de Pico
+ * @note 0  : OK
+ * @note 1  : Aller en Phase 1
+ * @note 2  : Fin de la phase microcode
+ * @note 8  : Accès mémoire interdit
+ * @note 16 : Instruction inconnue
+ * @note 32 : Défaillance processeur
+ * @note 64 : Extinction de Pico
  */
 pstatus	coeur(Mini_ordi *pico, Dbg *dbg) {
 	pstatus	status = PICO_OK;
@@ -287,13 +287,13 @@ pstatus	coeur(Mini_ordi *pico, Dbg *dbg) {
 		if (pico->modes.verbeux && !pico->modes.debogage)
 			printf(".");
 		status = phase(pico, dbg, &phase_1, 1);
-		if (status == PICO_JUMP_PHASE_1) continue;
+		if (status == PICO_PHASE_1) continue;
 		if (status > PICO_FIN_PHASE) return (status);
 		status = phase(pico, dbg, &pico->microsequences[pico->OP], 2);
-		if (status == PICO_JUMP_PHASE_1) continue;
+		if (status == PICO_PHASE_1) continue;
 		if (status > PICO_FIN_PHASE) return (status);
 		status = phase(pico, dbg, &phase_3, 3);
-		if (status == PICO_JUMP_PHASE_1) continue;
+		if (status == PICO_PHASE_1) continue;
 		if (status > PICO_FIN_PHASE) return (status);
 	}
 	return (PICO_OK);
