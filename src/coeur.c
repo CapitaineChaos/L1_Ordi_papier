@@ -284,7 +284,9 @@ pstatus	coeur(Mini_ordi *pico, Dbg *dbg) {
 
 	while (status < PICO_ERR_MEMOIRE)
 	{
-		if (pico->modes.verbeux && !pico->modes.debogage)
+		// Masquer la progression du bootstrap (PC < 32) sauf si -b est actif
+		if (pico->modes.verbeux && !pico->modes.debogage
+			&& (pico->modes.bootstrap || pico->PC >= 32))
 			printf(".");
 		status = phase(pico, dbg, &phase_1, 1);
 		if (status == PICO_PHASE_1) continue;

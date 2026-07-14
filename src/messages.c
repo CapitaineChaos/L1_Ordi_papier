@@ -65,10 +65,11 @@ void	msg_print_debug_help(void) {
 	printf(MSG_CMDS);
 }
 
-void	msg_print_input_prompt(Modes *modes) {
+void	msg_print_input_prompt(Modes *modes, u8 PC) {
 	if (!modes->verbeux)
 		return;
-	if (modes->bootstrap)
+	// Bootstrap occupe 00-1F
+	if (PC < 32)
 		printf(modes->mode_hexa ? MSG_INPUT_BOOTSTRAP : MSG_INPUT_BOOTSTRAP_DEC);
 	else
 		printf(modes->mode_hexa ? MSG_INPUT_PROGRAM : MSG_INPUT_PROGRAM_DEC);

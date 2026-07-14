@@ -5,7 +5,7 @@
 Auteur : Sylvain Maitre     24002886
 
 Date de création :              03/10/2025
-Date de dernière modification : 22/06/2026
+Date de dernière modification : 14/06/2026
 
 Fichier     : messages.h
 Description : Messages généraux du programme (CLI, erreurs, signaux)
@@ -27,7 +27,7 @@ void	msg_print_signal(int sig);
 void	msg_print_usage(const char *nom);
 void	msg_print_error(Mini_ordi *pico, pstatus status);
 void	msg_print_debug_help(void);
-void	msg_print_input_prompt(Modes *modes);
+void	msg_print_input_prompt(Modes *modes, u8 PC);
 void	msg_perror_tty(void);
 
 
